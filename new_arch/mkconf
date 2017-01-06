@@ -1,0 +1,22 @@
+
+MYNAME=$0;
+
+BASE="./conf.base";
+NEW="./conf";
+
+usage()
+{
+cat <<EOF
+usage : $MYNAME args
+
+args:
+EOF
+}
+
+main()
+{
+	:
+}
+
+main $*;
+
