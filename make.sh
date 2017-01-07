@@ -158,10 +158,11 @@ ci()
 	dirname=`basename $PWD`;
 
 	(
-	cd ..
+	cd ..;
+	mkdir $revdir;
 	arcfile="$revdir/$dirname-`hostname -s`-$dstr.tar";
-	echo "creating archive in $arcfile"
-	tar cf $arcfile ./$dirname
+	echo "creating archive in $arcfile";
+	tar cf $arcfile ./$dirname;
 	)
 }
 
