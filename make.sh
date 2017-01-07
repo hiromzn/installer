@@ -159,7 +159,7 @@ ci()
 
 	(
 	cd ..;
-	mkdir $revdir;
+	if [ ! -d "$revdir" ]; then mkdir $revdir; fi;
 	arcfile="$revdir/$dirname-`hostname -s`-$dstr.tar";
 	echo "creating archive in $arcfile";
 	tar cf $arcfile ./$dirname;
