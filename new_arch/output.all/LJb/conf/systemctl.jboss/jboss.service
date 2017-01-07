@@ -1,0 +1,20 @@
+#
+# reference :
+#   filename : JP3-C6394-DOC-0004-01-ミドルウェア設計基準（Wildfly・Apache）_v1.0
+#   section : 7.3 自動起動
+#
+# path : /etc/systemd/system/jboss.service
+#
+
+[Unit]
+Description=JBoss Enterprise Application Server
+After=network.target
+
+[Service]
+Type=simple
+User=LJbOU
+Group=LJbOG
+ExecStart=/jast/home/LJb/opt/jbosseap/LJbA/bin/jbosseap.sh
+
+[Install]
+WantedBy=multi-user.target

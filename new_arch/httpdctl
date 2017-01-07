@@ -1,0 +1,198 @@
+#
+# $Header: /home/hmizuno/opens/CVSrepo/multi_instance/multiapache,v 1.2 2016/12/24 13:31:01 hmizuno Exp $
+# $Id: multiapache,v 1.2 2016/12/24 13:31:01 hmizuno Exp $
+#
+
+. ./env.base/common.env.BASE
+. ./common.h
+
+HTTPD_ORG_TOPDIR=/etc/httpd
+HTTPD_ORG_MODULES_ABS_DIR=/usr/lib64/httpd/modules
+
+# controle multiple apache instance
+
+##########
+
+usage()
+{
+cat <<EOF
+controle multiple apache HTTPD instance
+
+usage : $0 command <instance_definition_top_dir>
+
+<instance_definition_top_dir> has:
+	./env  ...... environment variable file
+	./conf ...... config file
+
+command :
+  setup [-f]
+	setup all config.
+	( -f : force execute )
+  check:
+	check all configuration
+  clean:
+	clean all cofiguration
+
+  checkps
+  	check all httpd process:
+EOF
+}
+
+#####################
+#
+# main
+#
+#####################
+main()
+{
+	APACHE_VER=`get-apache-version`;
+
+	cmd="$1";
+	INST_DIR="$2";
+	PRODUCT="httpd";
+
+	. $INST_DIR/env/os.env
+	. $INST_DIR/env/$PRODUCT.env
+
+case "$cmd" in
+##### setup ######
+setup )
+	setup $INST_DIR;
+	;;
+
+"check" )
+	for n in ${INST_LIST[@]}
+	do
+		echo "##### INSTANCE $n : diff httpd.conf"
+
+		ls -ld `get_httpd_topdir $n`;
+		ls -ld `get_httpd_logdir_abs $n`;
+		ls -ld `get_httpd_rundir_abs $n`;
+		wwwroot="`get_httpd_wwwroot $n`";
+		ls -ld $wwwroot
+		ls -ld $wwwroot/*
+
+		echo "--- check $HTTPD_ORG_TOPDIR-$n/conf/httpd.conf"
+		grep -e ^ServerRoot -e ^Document -e ^Listen -e ^PidFile -e ^DefaultRuntimeDir $HTTPD_ORG_TOPDIR-$n/conf/httpd.conf
+	done
+	;;
+"clean" )
+	rmdir_force $HTTPD_TOPDIR;
+	;;
+
+##### controle process ######
+checkps )
+	ps -ef |grep httpd
+	;;
+
+-? | * )
+	usage;
+	exit 1;
+	;;
+esac
+}
+
+pr_apache_ver()
+{
+	case "$APACHE_VER" in
+	2.2 ) echo "Apache VER 2.2" ;;
+	2.4 ) echo "Apache VER 2.4" ;;
+	esac
+}
+
+get-apache-version()
+{
+	if [ -d "$HTTPD_ORG_TOPDIR/conf.modules.d" ]; then
+		echo "2.4";
+	else
+		echo "2.2";
+	fi
+}
+
+install_mod_jk()
+{
+        modjkpath=$HTTPD_MOD_JK_PATH
+        bin=$ARCHIVE_DIR/tomcat-connectors-1.2.42/native/apache-2.0/mod_jk.so 
+
+        if [ -s "$bin" ]; then
+                echo "MESSAGE: installing $bin to $modjkpath"
+                cp $bin $modjkpath
+                chmod 755 $modjkpath
+                chown $OS_USER_NAME:$OS_GROUP_NAME $modjkpath
+        else
+                echo "ERROR: check $bin file...."
+        fi
+}
+
+setup_welcomepage_for_test() # confdir
+{
+	confdir=$1;
+	src=$confdir/index_test.html
+	if [ -s "$src" ]; then
+		target="$HTTPD_DOC_ROOT/index.html";
+		cp $src $target
+		chown $OS_USER_NAME:$OS_GROUP_NAME $target
+		chmod 644 $target
+	else
+		debug "MESSAGE : no $src : check this file."
+	fi
+}
+
+setup() # instdir
+{
+	instdir=$INST_DIR;
+	echo "setup $PRODUCT by $INST_DIR"
+
+  # topdir
+	check_dir $HTTPD_TOPDIR $FORCE;
+	mk_base_dir $HTTPD_TOPDIR;
+	cp -rp $HTTPD_ORG_TOPDIR $HTTPD_TOPDIR
+	chown -R $OS_USER_NAME:$OS_GROUP_NAME $HTTPD_TOPDIR
+
+  # config file
+	confdir=$instdir/conf/$PRODUCT
+
+	cp $confdir/httpd.conf $HTTPD_CONF_FILE
+	cp $confdir/custom.conf $HTTPD_CONF_CUSTOM
+	cp $confdir/mod_jk.conf $HTTPD_CONF_MODJK
+	cp $confdir/workers.properties $HTTPD_CONF_WORKERS
+
+	for f in $HTTPD_CONF_FILE $HTTPD_CONF_CUSTOM $HTTPD_CONF_MODJK $HTTPD_CONF_WORKERS
+	do
+		chown $OS_USER_NAME:$OS_GROUP_NAME $f;
+		chmod $HTTPD_CONF_FILE_MOD $f;
+	done
+
+  # OFF : SSL config
+	sslconf="$HTTPD_CONFD/ssl.conf";
+	if [ -s "$sslconf" ];
+	then
+		echo "CAUTION : $sslconf file was ignored !"
+		echo "        mv $sslconf $sslconf.__OFF__"
+		mv $sslconf $sslconf.__OFF__
+	fi
+
+  # logs dir
+	check_create_dir $HTTPD_LOG_DIR $OS_USER_NAME $OS_GROUP_NAME $HTTPD_LOG_DIR_MOD yes
+
+  # run dir
+	check_create_dir $HTTPD_RUN_DIR $OS_USER_NAME $OS_GROUP_NAME $HTTPD_RUN_DIR_MOD yes
+
+  # modules dir
+	rm -f $HTTPD_MODULES_DIR
+	cp -r $HTTPD_ORG_MODULES_ABS_DIR $HTTPD_MODULES_DIR
+	chown -R $OS_USER_NAME:$OS_GROUP_NAME $HTTPD_MODULES_DIR
+
+	install_mod_jk $name;
+
+  # www dir
+	check_create_dir $HTTPD_WWW_ROOT $OS_USER_NAME $OS_GROUP_NAME $HTTPD_WWW_ROOT_MOD $FORCE
+  # docroot dir
+	check_create_dir $HTTPD_DOC_ROOT $OS_USER_NAME $OS_GROUP_NAME $HTTPD_DOC_ROOT_MOD $FORCE
+	setup_welcomepage_for_test $confdir;
+  # cgiroot dir
+	check_create_dir $HTTPD_CGI_ROOT $OS_USER_NAME $OS_GROUP_NAME $HTTPD_CGI_ROOT_MOD $FORCE
+}
+
+main $*;
+

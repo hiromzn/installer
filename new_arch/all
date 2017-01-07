@@ -1,0 +1,71 @@
+
+MYNAME="$0";
+MYARGS="$*";
+
+main()
+{
+	cmd="$1";
+
+	case "$cmd" in
+	setup ) setup ;;
+	clean ) clean ;;
+	start ) start ;;
+	stop ) stop ;;
+	config ) config ;;
+	* )
+		cmd $cmd ;;
+	esac
+}
+
+setup()
+{
+	./usergroupctl-all setup
+	./httpdctl-all setup
+	./jbossctl-all setup
+	./sysctl-all setup httpd
+	./sysctl-all setup jboss
+}
+
+start()
+{
+	./sysctl-all start jboss
+	./sysctl-all start httpd
+}
+
+stop()
+{
+	./sysctl-all stop httpd
+	./sysctl-all stop jboss
+}
+
+config()
+{
+	./jbossctl-all wait
+	./jbossctl-all adduser
+	./jbossctl-all addconfig
+}
+
+clean()
+{
+	./sysctl-all stop httpd
+	./sysctl-all stop jboss
+	./sysctl-all clean httpd
+	./sysctl-all clean jboss
+	./httpdctl-all clean
+	./jbossctl-all clean
+	./usergroupctl-all clean
+}
+
+cmd()
+{
+	cmd="$1";
+	kind="$2";
+
+	for envdir in output/*;
+	do
+		echo "message : $cmd $envdir";
+	done
+}
+
+main $*;
+
