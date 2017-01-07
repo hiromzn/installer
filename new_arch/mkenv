@@ -2,30 +2,40 @@
 MYNAME="$0";
 MYARGS="$*";
 
-BASE="./env.base";
-NEW="./env";
+INST_NAME="$1";
+NUMBER="$2";
 
-. $BASE/common*base
-. $BASE/rule.env
+BASE_ENV="./env.base";
+NEW_ENV="./output/$INST_NAME/env";
+
+. $BASE_ENV/common*.BASE
+. $BASE_ENV/rule.env
 
 usage()
 {
 cat <<EOF
-usage : $MYNAME <INST_NAME>
+usage : $MYNAME <INST_NAME> <number>
 
 exsample of INST_NAME : LXa LEa LJa LVa SDa LXb LJb LVb SDb
+exsample of number    :   0   1   2   3   4   5   6   7   8
+
+number is used for port number offset;
 
 EOF
 }
 
 main()
 {
-	iname=$1;
-	num=$2;
+	iname=$INST_NAME;
+	num=$NUMBER;
+
+	mkdir -p "$NEW_ENV";
+
+	echo "MESSAGE: creating $iname:$num environment files into $NEW_ENV"
 
 	for envname in os httpd jboss systemctl.jboss systemctl.httpd
 	do
-		bfile="$BASE/$envname.env.base";
+		bfile="$BASE_ENV/$envname.env.BASE";
 		if [ -s "$bfile" ]
 		then
 		cat $bfile | \
@@ -36,7 +46,7 @@ main()
 			systemctl.jboss ) mk_systemctl_env "jboss" $iname $num ;;
 			systemctl.httpd ) mk_systemctl_env "httpd" $iname $num ;;
 			* ) echo "ERROR: $envname case string is NOT defined in $MYNAME:main()" 1>&2; exit 1;;
-			esac >$NEW/$envname.env
+			esac >$NEW_ENV/$envname.env
 		else
 			"ERROR: $bfile is NOT exist";
 			exit 1;
@@ -70,7 +80,7 @@ mk_httpd_env() # iname num
 	num="$2";
 
 
-	. $NEW/os.env
+	. $NEW_ENV/os.env
 
 	HTTPD_LISTEN_PORT_BASE=81
 
@@ -88,6 +98,8 @@ mk_httpd_env() # iname num
 		-e 's[__HTTPD_TOPDIR__['${topdir}'[g' \
 		-e 's[__HTTPD_LISTEN_PORT__['${listenport}'[g' \
 		-e 's[__HTTPD_WORKER_SERVER1_PORT__['${workerport}'[g' \
+		-e 's[__HTTPD_USER__['${OS_USER_NAME}'[g' \
+		-e 's[__HTTPD_GROUP__['${OS_GROUP_NAME}'[g' \
 		;
 }
 
@@ -111,7 +123,7 @@ mk_jboss_env() # iname num
 	iname="$1";
 	num="$2";
 
-	. $NEW/os.env
+	. $NEW_ENV/os.env
 
 	HTTPD_LISTEN_PORT_BASE=81
 

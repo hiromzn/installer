@@ -1,21 +1,201 @@
 
-MYNAME=$0;
+MYNAME="$0";
+MYARGS="$*";
 
-BASE="./conf.base";
-NEW="./conf";
+BASE_CONF="./conf.base";
 
+TGT_ENV="
+	os
+	httpd
+	jboss
+	systemctl.httpd
+	systemctl.jboss
+";
+	
 usage()
 {
 cat <<EOF
-usage : $MYNAME args
+usage : $MYNAME <environment_dir>
 
-args:
+environment dir :
+	./httpd.env
+	./jboss.env
+	./systemctl.httpd.env
+	./systemctl.jboss.env
 EOF
 }
 
 main()
 {
-	:
+	envdir="$1";
+
+	check_envdir $envdir;
+
+	NEW_CONF="`echo $envdir |sed 's/env\/$//' \
+				|sed 's/env$//' \
+				|sed 's/^$/\./' \
+				|sed 's[\(.*\)/$[\1[' \
+				|sed 's[$[/conf[' `";
+
+	echo "MESSAGE : make config files for $envdir into $NEW_CONF";
+
+	os_envfile="$envdir/os.env";
+
+	for envname in $TGT_ENV
+	do
+		envfile="$envdir/$envname.env";
+		if [ -s "$envfile" ];
+		then
+			case "$envname" in
+			os ) os_flag=1; ;;
+			httpd ) mk_conf_httpd $envfile ;;
+			jboss ) mk_conf_jboss $envfile ;;
+			systemctl.httpd ) mk_conf_systemctl_httpd $envfile ;;
+			systemctl.jboss ) mk_conf_systemctl_jboss $envfile ;;
+			esac
+		fi
+	done
+}
+
+check_envdir() # envdir
+{
+	envdir="$1";
+	flag=0;
+	for f in $TGT_ENV
+	do
+		envfile="$envdir/$f.env";
+		if [ -s "$envfile" ]; then
+			flag=`expr $flan + 1`;
+		fi
+	done
+	if [ "$flag" -eq 0 ]; then
+		echo "ERROR: $envdir does NOT have ($TGT_ENV).env"
+	fi
+}
+
+os_conf_filter() # void
+{
+	. $os_envfile;
+        sed \
+		-e "s[__OS_USER_NAME__[$OS_USER_NAME[g" \
+		-e "s[__OS_USER_ID__[$OS_USER_ID[g" \
+		-e "s[__OS_GROUP_NAME__[$OS_GROUP_NAME[g" \
+		-e "s[__OS_GROUP_ID__[$OS_GROUP_ID[g" \
+		-e "s[__OS_USER_HOME__[$OS_USER_HOME[g" \
+		;
+}
+
+mk_conf_httpd() # envfile
+{
+	envfile="$1";
+	. $envfile
+
+	kind="httpd";
+
+	mkdir -p "$NEW_CONF/$kind";
+	for f in $BASE_CONF/$kind/*.BASE
+	do
+		fbase="`basename $f .BASE`";
+		newconf="$NEW_CONF/$kind/$fbase";
+		cat $f |httpd_conf_filter >$newconf;
+	done
+}
+
+httpd_conf_filter() # void
+{
+        timestamp="`date $DATE_TIME_FMT`";
+        sed \
+                -e "s[__CREATE_DATE__[$timestamp[g" \
+                -e "s[__HTTPD_SERVER_ROOT__[${HTTPD_TOPDIR}[g" \
+                -e "s[__HTTPD_DOCUMENT_ROOT__[${HTTPD_DOC_ROOT}[g" \
+                -e "s[__HTTPD_WWW_ROOT__[${HTTPD_WWW_ROOT}[g" \
+                -e "s[__HTTPD_CGI_ROOT__[${HTTPD_CGI_ROOT}[g" \
+                -e "s[__HTTPD_LISTEN__[${HTTPD_LISTEN_PORT}[g" \
+                -e "s[__HTTPD_USER__[${HTTPD_USER}[g" \
+                -e "s[__HTTPD_GROUP__[${HTTPD_GROUP}[g" \
+                -e "s[__HTTPD_CORE_DUMP_DIR__[${HTTPD_CORE_DUMP_DIR}[" \
+                -e "s[__HTTPD_WORKER_SERVER1_HOST__[${HTTPD_WORKER_SERVER1_HOST}[" \
+                -e "s[__HTTPD_WORKER_SERVER1_PORT__[${HTTPD_WORKER_SERVER1_PORT}[" \
+                -e "s[__HTTPD_CONF_FILE__[${HTTPD_CONF_FILE}[" \
+                ;
+}
+
+mk_conf_jboss() # envfile
+{
+	envfile="$1";
+	. $envfile
+
+	kind="jboss";
+
+	mkdir -p "$NEW_CONF/$kind";
+	for f in $BASE_CONF/$kind/*.BASE
+	do
+		fbase="`basename $f .BASE`";
+		newconf="$NEW_CONF/$kind/$fbase";
+		cat $f |jboss_conf_filter >$newconf;
+	done
+}
+
+jboss_conf_filter() # void
+{
+        sed \
+                -e "s[__JBOSS_USER__[$JBOSS_USER[g" \
+                -e "s[__JBOSS_GROUP__[$JBOSS_GROUP[g" \
+                -e "s[__JBOSS_HOME__[$JBOSS_HOME[g" \
+                -e "s[__JBOSS_JAVA_HOME__[$JBOSS_JAVA_HOME[g" \
+                -e "s[__JBOSS_JAVA_OPTS__[$JBOSS_JAVA_OPTS[g" \
+                -e "s[__JBOSS_CONFIG_NAME__[$JBOSS_CONFIG_NAME[g" \
+                -e "s[__JBOSS_SERVER_NAME__[$JBOSS_SERVER_NAME[g" \
+                -e "s[__JBOSS_SERVER_HOME__[$JBOSS_SERVER_HOME[g" \
+                -e "s[__JBOSS_START_SCRIPT_NAME__[$JBOSS_START_SCRIPT_NAME[g" \
+                -e "s[__JBOSS_PORT_OFFSET__[$JBOSS_PORT_OFFSET[g" \
+                -e "s[__JBOSS_BIND_ADDR__[$JBOSS_BIND_ADDR[g" \
+                -e "s[__JBOSS_MGMT_ADDR__[$JBOSS_MGMT_ADDR[g" \
+                ;
+}
+
+mk_conf_systemctl_jboss() # envfile
+{
+	envfile="$1";
+	. $envfile
+
+	kind="systemctl.jboss";
+
+	mkdir -p "$NEW_CONF/$kind";
+	for f in $BASE_CONF/$kind/*.BASE
+	do
+		fbase="`basename $f .BASE`";
+		newconf="$NEW_CONF/$kind/$fbase";
+		cat $f \
+			|jboss_conf_filter \
+			|os_conf_filter \
+			>$newconf;
+	done
+}
+
+mk_conf_systemctl_httpd() # envfile
+{
+	envfile="$1";
+	. $envfile
+
+	kind="systemctl.httpd";
+
+	mkdir -p "$NEW_CONF/$kind";
+	for f in $BASE_CONF/$kind/*.BASE
+	do
+		fbase="`basename $f .BASE`";
+		newconf="$NEW_CONF/$kind/$fbase";
+		cat $f \
+			|httpd_conf_filter \
+			|systemctl_httpd_conf_filter \
+			>$newconf;
+	done
+}
+systemctl_httpd_conf_filter() # void
+{
+        sed \
+                -e "s[__HTTPD_SYSCONFIG_FILE__[${SYSCONFIG_FILE}[" \
+                ;
 }
 
 main $*;
