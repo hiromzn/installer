@@ -13,47 +13,12 @@ debug() { if [ "$DEBUG" = "DEBUG" ]; then echo "DEBUG: $*"; fi }
 #######################
 # directory
 #######################
-chperm() # path own grp permittion
-{
-	path=$1
-	perm=$4;
-
-	chown -R $2:$3 $path
-	if [ -n "$perm" ]
-	then
-		chmod $perm $path
-	fi
-}
-
 create_dir() # dirname own grp permittion
 {
 	tgt=$1
 	mkdir $tgt
 	chown $2:$3 $tgt
 	chmod $4 $tgt
-}
-
-check_dir() # dirname [force(yes)]
-{
-	cdir=$1
-	force=$2
-
-	if [ -d "$cdir" -o -h "$cdir" ]; then
-	if [ "$force" = "yes" ]; then
-		echo "LOG: remove dir : rm -rf $cdir"
-		rm -rf $cdir
-	else
-		echo "ERROR: $cdir exists"
-		echo "  check $cdir or remove it ( rm -rf $cdir )"
-		exit 1
-	fi
-	fi
-}
-
-check_create_dir() # dirname own grp permittion [force(yes)]
-{
-	check_dir $1 $5;
-	create_dir $*;
 }
 
 rmdir_force()

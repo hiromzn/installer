@@ -2,6 +2,8 @@
 MYNAME="$0";
 MYARGS="$*";
 
+. ./common.env
+
 main()
 {
 	action="$1";
@@ -19,7 +21,7 @@ main()
 
 add_all()
 {
-	for instdir in output/*;
+	for instdir in $OUTPUT_DIR/*;
 	do
 		echo $instdir
 		./usergroupctl addgroup $instdir
@@ -29,7 +31,7 @@ add_all()
 
 del_all()
 {
-	for instdir in output/*;
+	for instdir in $OUTPUT_DIR/*;
 	do
 		echo $instdir
 		./usergroupctl deluser $instdir

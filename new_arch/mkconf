@@ -2,6 +2,8 @@
 MYNAME="$0";
 MYARGS="$*";
 
+. ./common.env
+
 BASE_CONF="./conf.base";
 
 TGT_ENV="
@@ -27,7 +29,7 @@ EOF
 
 main()
 {
-	envdir="$1";
+	envdir="$1"; # ex) ./<TOP>/env/
 
 	check_envdir $envdir;
 

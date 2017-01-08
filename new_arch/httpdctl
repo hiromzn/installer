@@ -3,7 +3,7 @@
 # $Id: multiapache,v 1.2 2016/12/24 13:31:01 hmizuno Exp $
 #
 
-. ./env.base/common.env.BASE
+. ./common.env
 . ./common.h
 
 HTTPD_ORG_TOPDIR=/etc/httpd
@@ -143,9 +143,9 @@ setup() # instdir
 	instdir=$INST_DIR;
 	echo "setup $PRODUCT by $INST_DIR"
 
-  # topdir
-	check_dir $HTTPD_TOPDIR $FORCE;
+  # HTTPD_TOPDIR : cleanup and create
 	mk_base_dir $HTTPD_TOPDIR;
+	rm -rf $HTTPD_TOPDIR; # remove old directory
 	cp -rp $HTTPD_ORG_TOPDIR $HTTPD_TOPDIR
 	chown -R $OS_USER_NAME:$OS_GROUP_NAME $HTTPD_TOPDIR
 
@@ -163,7 +163,7 @@ setup() # instdir
 		chmod $HTTPD_CONF_FILE_MOD $f;
 	done
 
-  # OFF : SSL config
+  # REMOVE SSL config
 	sslconf="$HTTPD_CONFD/ssl.conf";
 	if [ -s "$sslconf" ];
 	then
@@ -173,10 +173,18 @@ setup() # instdir
 	fi
 
   # logs dir
-	check_create_dir $HTTPD_LOG_DIR $OS_USER_NAME $OS_GROUP_NAME $HTTPD_LOG_DIR_MOD yes
+	rm -f $HTTPD_LOG_DIR; # remove symbolic link
+	create_dir $HTTPD_LOG_DIR \
+		$OS_USER_NAME \
+		$OS_GROUP_NAME \
+		$HTTPD_LOG_DIR_MOD;
 
   # run dir
-	check_create_dir $HTTPD_RUN_DIR $OS_USER_NAME $OS_GROUP_NAME $HTTPD_RUN_DIR_MOD yes
+	rm -f $HTTPD_RUN_DIR; # remove symbolic link
+	create_dir $HTTPD_RUN_DIR \
+		$OS_USER_NAME \
+		$OS_GROUP_NAME \
+		$HTTPD_RUN_DIR_MOD;
 
   # modules dir
 	rm -f $HTTPD_MODULES_DIR
@@ -186,12 +194,23 @@ setup() # instdir
 	install_mod_jk $name;
 
   # www dir
-	check_create_dir $HTTPD_WWW_ROOT $OS_USER_NAME $OS_GROUP_NAME $HTTPD_WWW_ROOT_MOD $FORCE
+	create_dir $HTTPD_WWW_ROOT \
+		$OS_USER_NAME \
+		$OS_GROUP_NAME \
+		$HTTPD_WWW_ROOT_MOD;
+
   # docroot dir
-	check_create_dir $HTTPD_DOC_ROOT $OS_USER_NAME $OS_GROUP_NAME $HTTPD_DOC_ROOT_MOD $FORCE
+	create_dir $HTTPD_DOC_ROOT \
+		$OS_USER_NAME \
+		$OS_GROUP_NAME \
+		$HTTPD_DOC_ROOT_MOD;
 	setup_welcomepage_for_test $confdir;
+
   # cgiroot dir
-	check_create_dir $HTTPD_CGI_ROOT $OS_USER_NAME $OS_GROUP_NAME $HTTPD_CGI_ROOT_MOD $FORCE
+	create_dir $HTTPD_CGI_ROOT \
+		$OS_USER_NAME \
+		$OS_GROUP_NAME \
+		$HTTPD_CGI_ROOT_MOD;
 }
 
 main $*;

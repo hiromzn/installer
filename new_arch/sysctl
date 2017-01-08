@@ -3,55 +3,12 @@
 # $Id: multiapache,v 1.2 2016/12/24 13:31:01 hmizuno Exp $
 #
 
-DEBUG=on
-
-. ./env.base/common.env.BASE
-. ./common.h
-
 # controle multiple systemctl instance
 
-##############################
-#
-# cofiguration
-#
-##############################
+DEBUG=on
 
-#
-# service configration file
-#
-#  ex ) /etc/systemd/system/httpd.service
-#
-create_servicefile() # kind
-{
-	kind=$1;
-	sfile_base="$confdir/$kind.service";
-
-	if [ -s "$sfile_base" ]; then
-		cp $sfile_base $SERVICE_FILE;
-	else
-		echo "MESSAGE: $sfile_base does NOT exists."
-		echo "MESSAGE: skip to create $base:$name service file"
-	fi
-}
-
-#
-# environment configration file
-#
-#  ex ) /etc/sysconfig/httpd
-#
-create_sysconfigfile() # kind
-{
-	kind=$1;
-	sconfile=$SYSCONFIG_FILE
-	sconfile_base="$confdir/$kind";
-
-	if [ -s "$sconfile_base" ]; then
-		cp $sconfile_base $sconfile;
-	else
-		echo "MESSAGE: $sconfile_base does NOT exists."
-		echo "MESSAGE: skip to create $base:$name systemctl config file"
-	fi
-}
+. ./common.env
+. ./common.h
 
 usage()
 {
@@ -85,17 +42,6 @@ command :
 EOF
 }
 
-do_cmd_instance() # cmd(start/stop/etc...)
-{
-	cmd="$1";
-
-	sname=$SERVICE_NAME
-
-	echo "MESSAGE : $cmd $target service:$sname"
-	echo systemctl $cmd $sname
-	systemctl $cmd $sname
-}
-
 #####################
 #
 # main
@@ -117,11 +63,16 @@ main()
 	case "$cmd" in
 	##### setup ######
 	setup )
-		echo "creating $ctltarget : $name instance of systemctl"
+		echo "creating $kind instance of systemctl : $confdir"
 		create_sysconfigfile $kind;
 		create_servicefile $kind;
 		echo "MESSAGE: systemctl daemon-reload"
 		systemctl daemon-reload;
+		;;
+
+	clean )
+		rmdir_force $SERVICE_FILE;
+		rmdir_force $SYSCONFIG_FILE;
 		;;
 
 "check" )
@@ -147,11 +98,6 @@ main()
 	done
 	;;
 
-	"clean" )
-		rmdir_force $SERVICE_FILE;
-		rmdir_force $SYSCONFIG_FILE;
-		;;
-
 ##### controle process ######
 	start | stop | enable | disable | status )
 		do_cmd_instance $cmd
@@ -166,6 +112,59 @@ checkps )
 	;;
 esac
 }
+##############################
+#
+# cofiguration
+#
+##############################
+
+#
+# service configration file
+#
+#  ex ) /etc/systemd/system/httpd.service
+#
+create_servicefile() # kind
+{
+	kind=$1;
+	sfile_base="$confdir/$kind.service";
+
+	if [ -s "$sfile_base" ]; then
+		cp $sfile_base $SERVICE_FILE;
+	else
+		echo "ERROR: $sfile_base does NOT exists."
+		exit 1;
+	fi
+}
+
+#
+# environment configration file
+#
+#  ex ) /etc/sysconfig/httpd
+#
+create_sysconfigfile() # kind
+{
+	kind=$1;
+	sconfile=$SYSCONFIG_FILE
+	sconfile_base="$confdir/$kind";
+
+	if [ -s "$sconfile_base" ]; then
+		cp $sconfile_base $sconfile;
+	else
+		debug "DEBUG: skip to create $kind systemctl config file"
+	fi
+}
+
+do_cmd_instance() # cmd(start/stop/etc...)
+{
+	cmd="$1";
+
+	sname=$SERVICE_NAME
+
+	echo "MESSAGE : $cmd $target service:$sname"
+	echo systemctl $cmd $sname
+	systemctl $cmd $sname
+}
+
 
 main $*;
 

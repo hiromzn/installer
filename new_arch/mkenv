@@ -2,13 +2,9 @@
 MYNAME="$0";
 MYARGS="$*";
 
-INST_NAME="$1";
-NUMBER="$2";
-
 BASE_ENV="./env.base";
-NEW_ENV="./output/$INST_NAME/env";
 
-. $BASE_ENV/common*.BASE
+. ./common.env
 . $BASE_ENV/rule.env
 
 usage()
@@ -26,8 +22,10 @@ EOF
 
 main()
 {
-	iname=$INST_NAME;
-	num=$NUMBER;
+	iname=$1;
+	num=$2;
+
+	NEW_ENV="$OUTPUT_DIR/$iname/env";
 
 	mkdir -p "$NEW_ENV";
 

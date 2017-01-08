@@ -3,14 +3,14 @@
 # directory structure & scripts
 #--------------------------------
 #
-#	BASE/
+#   TOOL_HOME/
 #		env.base/
 #			httpd, jboss, systemctl[httpd/jboss]
 #		conf.base/
 #			httpd, jboss, systemctl[httpd/jboss], testapp
 #
 # : mkenv
-#   ./output/
+#   ./$OUTPUT_DIR/
 #	<INST_NAME>/
 #		env/
 #			os, httpd, jboss, systemctl[httpd/jboss]

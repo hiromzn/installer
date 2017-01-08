@@ -1,0 +1,119 @@
+
+MYNAME="$0";
+MYARGS="$*";
+
+. ./common.env
+
+usage()
+{
+cat <<EOF
+usage : $MYNAME command
+
+command :
+	setup
+	clean
+
+	start
+	stop
+
+	config
+EOF
+}
+
+main()
+{
+	cmd="$1";
+
+	check_env;
+
+	case "$cmd" in
+	setup ) setup ;;
+	clean ) clean ;;
+	start ) start ;;
+	stop ) stop ;;
+	config ) config ;;
+	* )
+		usage;
+	esac
+}
+
+setup()
+{
+	./usergroupctl-all setup
+	./httpdctl-all setup
+	./jbossctl-all setup
+	./sysctl-all setup httpd
+	./sysctl-all setup jboss
+}
+
+start()
+{
+	./sysctl-all start jboss
+	./sysctl-all start httpd
+}
+
+stop()
+{
+	./sysctl-all stop httpd
+	./sysctl-all stop jboss
+}
+
+config()
+{
+	./jbossctl-all wait
+	./jbossctl-all adduser
+	./jbossctl-all addconfig
+}
+
+clean()
+{
+	./sysctl-all stop httpd
+	./sysctl-all stop jboss
+	./sysctl-all clean httpd
+	./sysctl-all clean jboss
+	./httpdctl-all clean
+	./jbossctl-all clean
+	./usergroupctl-all clean
+}
+
+cmd()
+{
+	cmd="$1";
+	kind="$2";
+
+	for envdir in $OUTPUT_DIR/*;
+	do
+		echo "message : $cmd $envdir";
+	done
+}
+
+check_env()
+{
+	check_install_httpd;
+	check_run_user "root";
+}
+
+check_run_user()
+{
+	runid="$1";
+	if [ "`id -un`" != $runid ];
+	then
+		echo "ERROR: please run this script using \"$runid\" account !"
+		exit 1;
+	fi
+}
+
+check_install_httpd()
+{
+	bin="/usr/sbin/httpd";
+
+	if [ ! -x "$bin" ];
+	then
+		echo "ERROR: check \"$bin\" executable file !"
+		echo "       install $bin file by \"yum install httpd\" command."
+		exit 1;
+	fi
+}
+
+main $*;
+

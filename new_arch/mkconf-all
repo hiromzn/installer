@@ -2,10 +2,12 @@
 MYNAME="$0";
 MYARGS="$*";
 
+. ./common.env
+
 main()
 {
 	num=0;
-	for envdir in output/*/env;
+	for envdir in $OUTPUT_DIR/*/env;
 	do
 		./mkconf $envdir;
 		num="`expr $num + 1`";

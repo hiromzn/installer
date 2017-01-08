@@ -5,7 +5,7 @@
 
 # controle multiple jboss eap instance
 
-. ./env.base/common.env.BASE
+. ./common.env
 . ./common.h
 
 ###############
@@ -43,7 +43,7 @@ create_jboss_inst()
 
 		chmod $JBOSS_RUN_PERM $JBOSS_SERVER_NAME/bin/$JBOSS_RUN_FNAME
 
-		chperm $JBOSS_SERVER_NAME $OS_USER_NAME $OS_GROUP_NAME
+		chown -R $OS_USER_NAME:$OS_GROUP_NAME $JBOSS_SERVER_NAME
 	)
 }
 

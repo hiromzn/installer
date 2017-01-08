@@ -2,6 +2,8 @@
 MYNAME="$0";
 MYARGS="$*";
 
+. ./common.env
+
 main()
 {
 	cmd="$1";
@@ -16,7 +18,7 @@ main()
 
 setup()
 {
-	for envdir in output/*;
+	for envdir in $OUTPUT_DIR/*;
 	do
 		./sysctl setup httpd $envdir;
 		./sysctl setup jboss $envdir;
@@ -25,7 +27,7 @@ setup()
 
 clean()
 {
-	for envdir in output/*;
+	for envdir in $OUTPUT_DIR/*;
 	do
 		./sysctl clean httpd $envdir;
 		./sysctl clean jboss $envdir;
@@ -37,7 +39,7 @@ cmd()
 	cmd="$1";
 	kind="$2";
 
-	for envdir in output/*;
+	for envdir in $OUTPUT_DIR/*;
 	do
 		./sysctl $cmd $kind $envdir;
 	done
