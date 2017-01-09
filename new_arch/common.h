@@ -7,8 +7,31 @@ DEBUG=;		# no debug
 # DEBUG=on	# standard debug
 # DEBUG=DEBUG	# detail debug
 
-msg()   { if [ -n "$DEBUG" ]; then echo "MESSAGE: $*"; fi }
-debug() { if [ "$DEBUG" = "DEBUG" ]; then echo "DEBUG: $*"; fi }
+######################
+# log
+######################
+
+pr_logheader()
+{
+cat <<EOF
+#
+# autogenerate : `LANG=C date`
+#
+
+EOF
+}
+msg()
+{
+	if [ -n "$DEBUG" ]; then
+		echo "MESSAGE: $*";
+	fi
+}
+debug()
+{
+	if [ "$DEBUG" = "DEBUG" ]; then
+		echo "DEBUG: $*";
+	fi
+}
 
 #######################
 # directory

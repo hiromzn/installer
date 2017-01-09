@@ -12,8 +12,12 @@ main()
 	case "$cmd" in
 	setup ) setup ;;
 	clean ) clean ;;
-	start | stop | adduser | addconfig | wait )
+	start | stop | adduser | addconfig | wait | deploy )
 		cmd $cmd $kind ;;
+	* ) 
+		echo "ERROR: bad command : $cmd : $MYNAME";
+		exit 1;
+		;;
 	esac
 }
 

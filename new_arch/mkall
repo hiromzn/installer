@@ -10,6 +10,9 @@ cat <<EOF
 usage : $MYNAME command
 
 command :
+	all
+		setup, start, config, deploy
+
 	setup
 	clean
 
@@ -17,6 +20,8 @@ command :
 	stop
 
 	config
+
+	deploy
 EOF
 }
 
@@ -27,14 +32,29 @@ main()
 	check_env;
 
 	case "$cmd" in
+	all ) all ;;
 	setup ) setup ;;
 	clean ) clean ;;
 	start ) start ;;
 	stop ) stop ;;
 	config ) config ;;
+	deploy ) deploy ;;
 	* )
 		usage;
 	esac
+}
+
+all()
+{
+	setup;
+	start;
+	config;
+	deploy;
+}
+
+deploy()
+{
+	./jbossctl-all deploy
 }
 
 setup()
@@ -90,6 +110,7 @@ cmd()
 check_env()
 {
 	check_install_httpd;
+	check_archive_files;
 	check_run_user "root";
 }
 
@@ -114,6 +135,24 @@ check_install_httpd()
 		exit 1;
 	fi
 }
+
+check_archive_files()
+{
+	for f in \
+		jboss-eap-7.0.0.zip \
+		postgresql-9.4.1212.jre7.jar \
+		tomcat-connectors-1.2.42 \
+		tomcat-connectors-1.2.42.tar \
+		app.war
+	do
+		if [ ! -s "$ARCHIVE_DIR/$f" ]
+		then
+			echo "ERROR: check $ARCHIVE_DIR/$f file."
+			exit 1;
+		fi
+	done
+}
+
 
 main $*;
 

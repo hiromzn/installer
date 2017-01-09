@@ -14,7 +14,6 @@
 
 install_jboss()
 {
-	JBOSS_INSTALL_ARCHIVE="$ARCHIVE_DIR/jboss-eap-7.0.0.zip"
 	echo "installing jboss : $JBOSS_INSTALL_ARCHIVE -> $JBOSS_HOME ..."
 	(
 		mkdir -p $JBOSS_HOME;
@@ -71,18 +70,27 @@ clean_jdbc_driver()
 #------------------
 # test application
 #------------------
+JBOSS_TESTAP="/tmp/$JBOSS_TESTAP_FNAME";
 prepare_testap()
 {
-	JBOSS_TESTAP="/tmp/$JBOSS_TESTAP_FNAME";
         cp $JBOSS_TESTAP_ARCHIVE $JBOSS_TESTAP;
         chmod o+r $JBOSS_TESTAP;
 }
-clean_testap(){
-	JBOSS_TESTAP="/tmp/$JBOSS_TESTAP_FNAME";
+deploy_testap()
+{
+	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
+	su - $OS_USER_NAME -c "$jbosscli" <<EOF
+deploy $JBOSS_TESTAP
+EOF
+}
+clean_testap()
+{
 	rm $JBOSS_TESTAP;
 }
 
-
+#------------------
+# configuration
+#------------------
 setup_jboss_web_container()
 {
 	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
@@ -136,13 +144,6 @@ module add --name=org.postgresql.jdbc --resources=$JBOSS_JDBC_DRIVER --dependenc
 EOF
 }
 
-deploy_testap()
-{
-	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
-	su - $OS_USER_NAME -c "$jbosscli" <<EOF
-deploy $JBOSS_TESTAP
-EOF
-}
 
 #OFF# setup_xa_data_source() # num name
 
@@ -287,7 +288,7 @@ clean )
 	clean_jboss;
 	;;
 
-deploytestap ) # script development test
+deploy ) # script development test
 	prepare_testap;
 	deploy_testap;
 	clean_testap;
