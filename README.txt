@@ -7,15 +7,12 @@ $ cd installer
 $ vi common.env
 ARCHIVE_DIR=${ARCHIVE_DIR:="<your_archive_dirctory_path>"}
 
-$ cp mod_jk/tomcat-connectors-1.2.42.tar <your_archive_directory_path>
-$ cp test/testap/app.war <your_archive_directory_path>
+$ ./mkall archive
+
 $ cp jboss-eap-7.0.0.zip <your_archive_directory_path>
 $ cp postgresql-9.4.1212.jre7.jar <your_archive_directory_path>
 
-$ cd <your_archive_directory_path>
-$ tar xf tomcat-connectors-1.2.42.tar
-
-$ ls -1
+$ ls -1 <your_archive_directory_path>
 app.war
 jboss-eap-7.0.0.zip
 postgresql-9.4.1212.jre7.jar

@@ -32,8 +32,8 @@ main()
 	cmd="$1";
 
 	case "$cmd" in
-	package )
-		package
+	package | archive )
+		$cmd
 		exit 0
 		;;
 	esac
@@ -59,6 +59,13 @@ all()
 	start;
 	config;
 	deploy;
+}
+
+archive()
+{
+	cp mod_jk/tomcat-connectors-1.2.42.tar $ARCHIVE_DIR;
+	cp test/testap/app.war $ARCHIVE_DIR;
+	( cd $ARCHIVE_DIR; tar xf tomcat-connectors-1.2.42.tar )
 }
 
 deploy()
