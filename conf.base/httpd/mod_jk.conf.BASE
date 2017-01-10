@@ -20,13 +20,15 @@ JkOptions +ForwardURIProxy -ForwardDirectories
 
 # Request forwarding
 # JkMount <URL Pattern>  <LoadBalnacer name>
-JkMount         /app     loadbalancer1
-JkMount         /app/*   loadbalancer1
 #JkMount         /application     loadbalancer1
 #JkMount         /application/*   loadbalancer1
 
+# TEST application url pattern
+JkMount         /app     loadbalancer1
+JkMount         /app/*   loadbalancer1
+
 <Location /jkstatus>
         JkMount status
-#        require ip 192.168.1.0/24
+# TEST #        require ip 192.168.1.0/24
 </Location>
 
