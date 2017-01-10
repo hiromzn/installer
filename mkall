@@ -190,7 +190,13 @@ package()
 		if [ ! -d "$revdir" ]; then mkdir $revdir; fi;
 		arcfile="$revdir/$dirname-`hostname -s`-$dstr.tar";
 		echo "creating archive in $arcfile";
+		mkdir work@@dir
+		cp -r $dirname work@@dir
+		cd work@@dir
+		rm -rf $dirname/.git
 		tar cf $arcfile ./$dirname;
+		cd ..;
+		rm -rf work@@dir;
 	)
 }
 
