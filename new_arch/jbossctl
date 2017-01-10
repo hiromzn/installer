@@ -8,6 +8,89 @@
 . ./common.env
 . ./common.h
 
+usage()
+{
+cat <<EOF
+controle multiple jboss instance
+
+usage : $0 command <INSTANCE_DIR>
+
+command : 
+  setup
+  clean
+  check
+  start
+  stop
+  checkps
+EOF
+}
+#####################
+#
+# main
+#
+#####################
+main()
+{
+        cmd="$1";
+        INST_DIR="$2";
+        PRODUCT="jboss";
+
+	. $INST_DIR/env/os.env
+	. $INST_DIR/env/$PRODUCT.env
+	
+	JBOSS_TESTAP="/tmp/$JBOSS_TESTAP_FNAME";
+
+	confdir=$INST_DIR/conf/$PRODUCT
+
+	case "$cmd" in
+	setup )
+		install_jboss;
+		create_jboss_inst;
+		;;
+
+	check )
+		ls -ld $JBOSS_HOME;
+		check_port;
+		;;
+
+	wait )
+		wait_startup
+		;;
+
+	clean )
+		echo "CLEANING: instance $JBOSS_SERVER_NAME"
+		clean_jboss;
+		;;
+
+	deploy ) # script development test
+		prepare_testap;
+		deploy_testap;
+		clean_testap;
+		;;
+
+	addconfig )
+		prepare_jdbc_driver;
+		addconfig_set;
+		clean_jdbc_driver;
+		;;
+
+	adduser )
+		echo "add default group : $JBOSS_SERVER_NAME"
+		add_jboss_default_group;
+		echo "add user : $JBOSS_SERVER_NAME"
+		add_jboss_user;
+		;;
+
+	checkps )
+		ps -ef |grep httpd
+		;;
+
+	-? | * )
+		usage;
+		exit 1;
+		;;
+	esac
+}
 ###############
 # functions
 ###############
@@ -70,9 +153,9 @@ clean_jdbc_driver()
 #------------------
 # test application
 #------------------
-JBOSS_TESTAP="/tmp/$JBOSS_TESTAP_FNAME";
 prepare_testap()
 {
+        debug cp $JBOSS_TESTAP_ARCHIVE $JBOSS_TESTAP;
         cp $JBOSS_TESTAP_ARCHIVE $JBOSS_TESTAP;
         chmod o+r $JBOSS_TESTAP;
 }
@@ -85,6 +168,7 @@ EOF
 }
 clean_testap()
 {
+	debug rm $JBOSS_TESTAP;
 	rm $JBOSS_TESTAP;
 }
 
@@ -211,34 +295,6 @@ wait_startup()
 	done
 }
 
-######################
-
-usage()
-{
-cat <<EOF
-controle multiple jboss instance
-
-command name : $0
-
-usage :
-  ## CONFIG ##
-  setup :
-	$0 setup
-  clean :
-	$0 clean
-  check :
-	$0 check
-
-  ## PROCESS ##
-  start:
-	$0 start instance_number
-  stop:
-	$0 stop instance_number
-  check all httpd process:
-	$0 checkps
-EOF
-}
-
 addconfig_set() # num inst
 {
 	echo "add web config : $JBOSS_SERVER_NAME"
@@ -250,74 +306,6 @@ addconfig_set() # num inst
 	check_data_source
 	setup_jboss_transaction
 }
-
-#####################
-#
-# main
-#
-#####################
-main()
-{
-        cmd="$1";
-        INST_DIR="$2";
-        PRODUCT="jboss";
-
-        . $INST_DIR/env/os.env
-        . $INST_DIR/env/$PRODUCT.env
-
-	confdir=$INST_DIR/conf/$PRODUCT
-
-case "$cmd" in
-##### setup ######
-setup )
-	install_jboss;
-	create_jboss_inst;
-	;;
-
-check )
-	ls -ld $JBOSS_HOME;
-	check_port;
-	;;
-
-wait )
-	wait_startup
-	;;
-
-clean )
-	echo "CLEANING: instance $JBOSS_SERVER_NAME"
-	clean_jboss;
-	;;
-
-deploy ) # script development test
-	prepare_testap;
-	deploy_testap;
-	clean_testap;
-	;;
-
-addconfig )
-	prepare_jdbc_driver;
-	addconfig_set;
-	clean_jdbc_driver;
-	;;
-
-adduser )
-	echo "add default group : $JBOSS_SERVER_NAME"
-	add_jboss_default_group;
-	echo "add user : $JBOSS_SERVER_NAME"
-	add_jboss_user;
-	;;
-
-checkps )
-	ps -ef |grep httpd
-	;;
-
--? | * )
-	usage;
-	exit 1;
-	;;
-esac
-}
-
 
 main $*;
 

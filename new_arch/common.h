@@ -3,13 +3,15 @@
 # $Id: functions.sh,v 1.1.1.1 2016/12/24 12:16:09 hmizuno Exp $
 #
 
-DEBUG=;		# no debug
-# DEBUG=on	# standard debug
-# DEBUG=DEBUG	# detail debug
-
 ######################
 # log
 ######################
+
+DEBUG=${DEBUG:=};
+
+# DEBUG=	# no debug
+# DEBUG=on	# standard debug
+# DEBUG=DEBUG	# detail debug
 
 pr_logheader()
 {

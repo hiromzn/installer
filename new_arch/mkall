@@ -111,7 +111,18 @@ check_env()
 {
 	check_install_httpd;
 	check_archive_files;
+	check_output_dir;
 	check_run_user "root";
+}
+
+check_output_dir()
+{
+	if [ ! -d "$OUTPUT_DIR" ]
+	then
+		echo "ERROR: OUTPUT_DIR(=$OUTPUT_DIR) environment is invalid !";
+		echo "       check common.env file or OUTPUT_DIR env value.";
+		exit 1;
+	fi
 }
 
 check_run_user()
@@ -142,7 +153,6 @@ check_archive_files()
 		jboss-eap-7.0.0.zip \
 		postgresql-9.4.1212.jre7.jar \
 		tomcat-connectors-1.2.42 \
-		tomcat-connectors-1.2.42.tar \
 		app.war
 	do
 		if [ ! -s "$ARCHIVE_DIR/$f" ]
