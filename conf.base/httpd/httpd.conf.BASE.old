@@ -1,7 +1,4 @@
 #
-# $Header: /home/hmizuno/opens/CVSrepo/multi_instance/apache/etc_httpd_conf_httpd.conf.BASE,v 1.1.1.1 2016/12/24 12:16:09 hmizuno Exp $
-# $Id: etc_httpd_conf_httpd.conf.BASE,v 1.1.1.1 2016/12/24 12:16:09 hmizuno Exp $
-#
 # This is the main Apache HTTP server configuration file.  It contains the
 # configuration directives that give the server its instructions.
 # See <URL:http://httpd.apache.org/docs/2.4/> for detailed information.

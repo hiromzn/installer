@@ -1,17 +1,13 @@
 #
-# $Header: /home/hmizuno/opens/CVSrepo/multi_instance/multiapache,v 1.2 2016/12/24 13:31:01 hmizuno Exp $
-# $Id: multiapache,v 1.2 2016/12/24 13:31:01 hmizuno Exp $
+# httpdctl : httpd controle
 #
-
+# controle multiple apache instance
+#
 . ./common.env
 . ./common.h
 
 HTTPD_ORG_TOPDIR=/etc/httpd
 HTTPD_ORG_MODULES_ABS_DIR=/usr/lib64/httpd/modules
-
-# controle multiple apache instance
-
-##########
 
 usage()
 {

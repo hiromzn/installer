@@ -1,8 +1,6 @@
 #
-# $Header: /home/hmizuno/opens/CVSrepo/multi_instance/functions.sh,v 1.1.1.1 2016/12/24 12:16:09 hmizuno Exp $
-# $Id: functions.sh,v 1.1.1.1 2016/12/24 12:16:09 hmizuno Exp $
+# common.h : common functions
 #
-
 ######################
 # log
 ######################

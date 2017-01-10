@@ -1,11 +1,8 @@
 #
-# $Header: /home/hmizuno/opens/CVSrepo/multi_instance/multiapache,v 1.2 2016/12/24 13:31:01 hmizuno Exp $
-# $Id: multiapache,v 1.2 2016/12/24 13:31:01 hmizuno Exp $
+# sysctl : systemd controle
 #
-
 # controle multiple systemctl instance
-
-DEBUG=on
+#
 
 . ./common.env
 . ./common.h
@@ -61,7 +58,6 @@ main()
         confdir=$INST_DIR/conf/$PRODUCT
 
 	case "$cmd" in
-	##### setup ######
 	setup )
 		echo "creating $kind instance of systemctl : $confdir"
 		create_sysconfigfile $kind;
@@ -75,42 +71,24 @@ main()
 		rmdir_force $SYSCONFIG_FILE;
 		;;
 
-"check" )
-	for name in ${INST_LIST[@]}
-	do
-		echo "##### INSTANCE $name : diff httpd.conf"
+	check )
+		ls -l $SYSCONFIG_FILE
+		ls -l $SERVICE_FILE
+		;;
 
-		sf=`get_servicefile $ctltarget $name`;
-		cf=`get_sysconfigfile $ctltarget $name`;
-
-		if [ $ctltarget = "httpd" ]
-		then
-			ls -ld $sf;
-			ls -ld $cf
-			echo "--- check $cf / $sf file"
-			grep -e $ctltarget-$name $sf $cf
-		else
-			ls -ld $sf;
-			echo "--- check $sf file"
-			grep -e $ctltarget-$name $sf
-		fi
-
-	done
-	;;
-
-##### controle process ######
 	start | stop | enable | disable | status )
 		do_cmd_instance $cmd
 		;;
-checkps )
-	ps -ef |grep httpd
-	;;
 
--? | * )
-	usage;
-	exit 1;
-	;;
-esac
+	checkps )
+		ps -ef |grep httpd
+		;;
+
+	-? | * )
+		usage;
+		exit 1;
+		;;
+	esac
 }
 ##############################
 #

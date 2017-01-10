@@ -43,6 +43,15 @@ $ sudo ./mkall config
 # deploy test ap into jboss
 $ sudo ./mkall deploy
 
+---------------------
+how to clean
+---------------------
+# stop all httpd and jboss processes
+$ sudo ./mkall stop
+
+# clean up all config file and installation (user/group, httpd, jboss, systemd)
+$ sudo ./mkall clean
+
 --------------------------------
  directory structure & scripts
 --------------------------------
