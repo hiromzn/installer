@@ -22,12 +22,21 @@ command :
 	config
 
 	deploy
+
+	package
 EOF
 }
 
 main()
 {
 	cmd="$1";
+
+	case "$cmd" in
+	package )
+		package
+		exit 0
+		;;
+	esac
 
 	check_env;
 
@@ -163,6 +172,20 @@ check_archive_files()
 	done
 }
 
+package()
+{
+	PWD="`pwd`";
+	dstr=`date +%Y-%m%d-%H%M-%S`;
+	revdir="$PWD/../rev/";
+	dirname=`basename $PWD`;
+	(
+		cd ..;
+		if [ ! -d "$revdir" ]; then mkdir $revdir; fi;
+		arcfile="$revdir/$dirname-`hostname -s`-$dstr.tar";
+		echo "creating archive in $arcfile";
+		tar cf $arcfile ./$dirname;
+	)
+}
 
 main $*;
 

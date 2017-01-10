@@ -5,7 +5,7 @@ MYARGS="$*";
 main()
 {
 	num=0;
-	for iname in LXa LEa LJa LVa SDa LXb LJb LVb SDb
+	for iname in LXa LEa LJa LVa SDa BPa LXb LJb LVb SDb BPb
 	do
 		./mkenv $iname $num
 		num="`expr $num + 1`";
