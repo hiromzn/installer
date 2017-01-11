@@ -2,12 +2,12 @@
 MYNAME="$0";
 MYARGS="$*";
 
-set-eu
+. ./common.env
 
 main()
 {
 	num=0;
-	for iname in LXa LEa LJa LVa SDa BPa LXb LJb LVb SDb BPb
+	for iname in $INSTANCE_LIST
 	do
 		./mkenv $iname $num
 		num="`expr $num + 1`";

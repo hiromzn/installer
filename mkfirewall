@@ -1,0 +1,67 @@
+
+MYNAME="$0";
+MYARGS="$*";
+
+. ./common.env
+. ./common.h
+
+set -eu
+
+FIREWALL_CMD_OPT="--zone=public";
+
+main()
+{
+	mkscript ap $FIREWALL_BASE_CONF_AP
+	mkscript db $FIREWALL_BASE_CONF_DB
+	mkscript common $FIREWALL_BASE_CONF_COMMON
+	mk_controle_script;
+}
+
+mk_controle_script()
+{
+	log "creating firewall controle script into $SCRIPT_DIR";
+	mkdir -p "$SCRIPT_DIR";
+	cp mkfirewall.controle.base $SCRIPT_DIR/fw.controle.sh
+	chmod 755 $SCRIPT_DIR/fw.controle.sh
+}
+
+mkscript() # server_kind confname_list.....
+{
+	log "creating firewall config script for $1 server into $SCRIPT_DIR";
+	mkdir -p "$SCRIPT_DIR";
+	create_firewall_conf_script "add" $*
+	create_firewall_conf_script "remove" $*
+}
+
+create_firewall_conf_script() # cmd confname
+{
+	cmd="$1";
+	kind="$2";
+	shift; shift;
+	list="$*";
+	for confname in $list
+	do
+		create_firewall_conf_cmd_script $cmd $confname
+	done >$SCRIPT_DIR/fw.$kind.$cmd.sh
+	chmod 755 $SCRIPT_DIR/fw.$kind.$cmd.sh
+}
+
+create_firewall_conf_cmd_script() # cmd confname
+{
+	cmd="$1";
+	confname="$2";
+	conffile="$FIREWALL_BASE_CONF_DIR/$confname.xml"
+		
+	if [ -s "$conffile" ]
+	then
+		echo firewall-cmd --$cmd-service=$confname --zone=public
+		echo firewall-cmd --$cmd-service=$confname --zone=public --permanent
+	else
+		error "ERROR : firewall config name:$confname is invalid!"
+		error "        check $conffile file."
+		exit 1;
+	fi
+}
+
+main $*;
+

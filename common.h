@@ -32,6 +32,14 @@ debug()
 		echo "DEBUG: $*";
 	fi
 }
+log() # messages...
+{
+	echo "`date $DATE_TIME_FMT`:" $*
+}
+error() # messages....
+{
+	echo $* 1>&2;
+}
 
 #######################
 # check
