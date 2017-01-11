@@ -84,13 +84,13 @@ mk_httpd_env() # iname num
 
 	. $NEW_ENV/os.env
 
-	HTTPD_LISTEN_PORT_BASE=81
+	HTTPD_PORT_HTTP_BASE=81
 
 	HTTPD_WORKER_SERVER1_PORT_BASE=8109	# DEFAULT + OFFSET
 	HTTPD_WORKER_SERVER1_PORT_OFFSET=100
 
 	topdir="$OS_USER_HOME/opt/httpd";
-	listenport="`expr $HTTPD_LISTEN_PORT_BASE + $num`";
+	listenport="`expr $HTTPD_PORT_HTTP_BASE + $num`";
 	workerport="`expr $HTTPD_WORKER_SERVER1_PORT_BASE + $HTTPD_WORKER_SERVER1_PORT_OFFSET \* $num`";
 
 	sed \
@@ -98,7 +98,7 @@ mk_httpd_env() # iname num
 		-e 's[__HEADER_ARGS__['"$MYARGS"'[g' \
 		-e 's[__HEADER_DATE__['`date $DATE_TIME_FMT`'[g' \
 		-e 's[__HTTPD_TOPDIR__['${topdir}'[g' \
-		-e 's[__HTTPD_LISTEN_PORT__['${listenport}'[g' \
+		-e 's[__HTTPD_PORT_HTTP__['${listenport}'[g' \
 		-e 's[__HTTPD_WORKER_SERVER1_PORT__['${workerport}'[g' \
 		-e 's[__HTTPD_USER__['${OS_USER_NAME}'[g' \
 		-e 's[__HTTPD_GROUP__['${OS_GROUP_NAME}'[g' \
@@ -126,8 +126,6 @@ mk_jboss_env() # iname num
 	num="$2";
 
 	. $NEW_ENV/os.env
-
-	HTTPD_LISTEN_PORT_BASE=81
 
 	jhome="$OS_USER_HOME/opt/\$JBOSS_HOME_NAME";
 	sname="${iname}A";
