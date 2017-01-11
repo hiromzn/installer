@@ -34,11 +34,11 @@ debug()
 }
 log() # messages...
 {
-	echo "`date $DATE_TIME_FMT`:" $*
+	echo "LOG:`date $DATE_TIME_FMT`:" $*
 }
 error() # messages....
 {
-	echo $* 1>&2;
+	echo "ERROR:" $* 1>&2;
 }
 
 #######################

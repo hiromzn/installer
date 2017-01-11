@@ -33,6 +33,11 @@ EOF
 
 main()
 {
+	if [ "$#" -eq 0 ]; then
+		usage;
+		exit 1;
+	fi
+
 	cmd="$1";
 
 	case "$cmd" in
@@ -54,6 +59,8 @@ main()
 	deploy ) deploy ;;
 	* )
 		usage;
+		exit 1
+		;;
 	esac
 }
 
@@ -84,6 +91,8 @@ setup()
 	./jbossctl-all setup
 	./sysctl-all setup httpd
 	./sysctl-all setup jboss
+	./sysctl-all enable httpd
+	./sysctl-all enable jboss
 }
 
 start()
@@ -107,6 +116,8 @@ config()
 
 clean()
 {
+	./sysctl-all disable httpd
+	./sysctl-all disable jboss
 	./sysctl-all clean httpd
 	./sysctl-all clean jboss
 	./httpdctl-all clean

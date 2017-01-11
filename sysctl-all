@@ -3,6 +3,7 @@ MYNAME="$0";
 MYARGS="$*";
 
 . ./common.env
+. ./common.h
 
 main()
 {
@@ -13,6 +14,10 @@ main()
 	setup ) setup ;;
 	clean ) clean ;;
 	start | stop | enable | disable | status ) cmd $cmd $kind ;;
+	* )
+		error "bad command : $cmd";
+		exit 1;
+		;;
 	esac
 }
 

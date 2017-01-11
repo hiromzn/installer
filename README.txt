@@ -31,7 +31,7 @@ $ ./mkenv-all
 # make all config files into output/<instance_name>/conf directory.
 $ ./mkconf-all
 
-# setup all instance of osuser/group, install jboss, setup httpd.
+# setup all instance of osuser/group, install jboss, setup httpd, systemctl of httpd/jboss and enable service.
 $ sudo ./mkall setup
 
 # start all instance of httpd and jboss 
@@ -58,7 +58,7 @@ how to clean
 # stop all httpd and jboss processes
 $ sudo ./mkall stop
 
-# clean up all config file and installation (user/group, httpd, jboss, systemd)
+# clean up all config file, installation (user/group, httpd, jboss, systemd) and disable all services of httpd/jboss.
 $ sudo ./mkall clean
 
 --------------------------------
@@ -96,4 +96,14 @@ $ sudo ./mkall clean
    : check
 		logs/check.httpd.log
 		logs/check.jboss.log
+
+   : mkfirewall
+	./$SCRIPT_DIR/
+		./fw.ap.add.sh		# add FW config of web/ap server
+		./fw.ap.remove.sh	# remove FW config of web/ap server
+		./fw.db.add.sh		# add FW config of DB server
+		./fw.db.remove.sh	# remove FW config of DB server
+		./fw.common.add.sh	# add FW config of common server
+		./fw.common.remove.sh	# remove FW config of common server
+		./fw.controle.sh
 
