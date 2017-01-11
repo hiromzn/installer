@@ -67,7 +67,7 @@ check_envdir() # envdir
 	do
 		envfile="$envdir/$f.env";
 		if [ -s "$envfile" ]; then
-			flag=`expr $flan + 1`;
+			flag=`expr $flag + 1`;
 		fi
 	done
 	if [ "$flag" -eq 0 ]; then
