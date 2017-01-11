@@ -4,6 +4,10 @@ MYARGS="$*";
 
 . ./common.env
 
+. ./common.h
+
+set -eu
+
 usage()
 {
 cat <<EOF
@@ -103,8 +107,6 @@ config()
 
 clean()
 {
-	./sysctl-all stop httpd
-	./sysctl-all stop jboss
 	./sysctl-all clean httpd
 	./sysctl-all clean jboss
 	./httpdctl-all clean
@@ -128,6 +130,8 @@ check_env()
 	check_install_httpd;
 	check_archive_files;
 	check_output_dir;
+	check_java;
+	check_enforce;
 	check_run_user "root";
 }
 

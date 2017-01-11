@@ -34,6 +34,45 @@ debug()
 }
 
 #######################
+# check
+#######################
+check_java()
+{
+	msg "message : check java install"
+	java -version 2>&1 |grep 'openjdk ' >/dev/null
+	if [ "$?" -ne 0 ]
+	then
+		echo "ERROR: check java install for openjdk"
+		echo "   check:"
+		echo "       $ which java"
+		echo "       $ java -version"
+		echo "   install:"
+		echo "       $ sudo yum –y install java-1.8.0-openjdk-devel"
+		exit 1;
+	fi
+}
+
+check_enforce()
+{
+	msg "message : check enforce"
+	getenforce |grep 'Permissive' >/dev/null
+	if [ "$?" -ne 0 ]
+	then
+		now="`getenforce`";
+		echo "ERROR: check SELinux mode in Permissive (now:$now)"
+		echo "   check:"
+		echo "       $ getenforce"
+		echo "   change dinamic config:"
+		echo "       $ sudo setenforce 0"
+		echo "   change static:"
+		echo "       $ sudo vi  /etc/selinux/config"
+		echo "       SELINUX=permissive"
+		exit 1;
+	fi
+}
+
+
+#######################
 # directory
 #######################
 create_dir() # dirname own grp permittion

@@ -41,8 +41,6 @@ EOF
 #####################
 main()
 {
-	APACHE_VER=`get-apache-version`;
-
 	cmd="$1";
 	INST_DIR="$2";
 	PRODUCT="httpd";
@@ -88,15 +86,7 @@ checkps )
 esac
 }
 
-pr_apache_ver()
-{
-	case "$APACHE_VER" in
-	2.2 ) echo "Apache VER 2.2" ;;
-	2.4 ) echo "Apache VER 2.4" ;;
-	esac
-}
-
-get-apache-version()
+get_apache_version()
 {
 	if [ -d "$HTTPD_ORG_TOPDIR/conf.modules.d" ]; then
 		echo "2.4";
@@ -187,7 +177,7 @@ setup() # instdir
 	cp -r $HTTPD_ORG_MODULES_ABS_DIR $HTTPD_MODULES_DIR
 	chown -R $OS_USER_NAME:$OS_GROUP_NAME $HTTPD_MODULES_DIR
 
-	install_mod_jk $name;
+	install_mod_jk;
 
   # www dir
 	create_dir $HTTPD_WWW_ROOT \

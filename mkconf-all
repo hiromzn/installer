@@ -4,6 +4,8 @@ MYARGS="$*";
 
 . ./common.env
 
+set -eu
+
 main()
 {
 	num=0;

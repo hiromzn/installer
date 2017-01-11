@@ -7,6 +7,8 @@ BASE_ENV="./env.base";
 . ./common.env
 . $BASE_ENV/rule.env
 
+. ./common.h
+
 usage()
 {
 cat <<EOF
@@ -30,6 +32,8 @@ main()
 	mkdir -p "$NEW_ENV";
 
 	echo "MESSAGE: creating $iname:$num environment files into $NEW_ENV"
+
+	check_java;
 
 	for envname in os httpd jboss systemctl.jboss systemctl.httpd
 	do

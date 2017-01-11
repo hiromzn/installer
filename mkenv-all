@@ -2,6 +2,8 @@
 MYNAME="$0";
 MYARGS="$*";
 
+set-eu
+
 main()
 {
 	num=0;

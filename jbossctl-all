@@ -7,13 +7,12 @@ MYARGS="$*";
 main()
 {
 	cmd="$1";
-	kind="$2";
 
 	case "$cmd" in
 	setup ) setup ;;
 	clean ) clean ;;
 	start | stop | adduser | addconfig | wait | deploy )
-		cmd $cmd $kind ;;
+		cmd $cmd ;;
 	* ) 
 		echo "ERROR: bad command : $cmd : $MYNAME";
 		exit 1;
@@ -40,7 +39,6 @@ clean()
 cmd()
 {
 	cmd="$1";
-	kind="$2";
 
 	for envdir in $OUTPUT_DIR/*;
 	do

@@ -138,7 +138,7 @@ do_cmd_instance() # cmd(start/stop/etc...)
 
 	sname=$SERVICE_NAME
 
-	echo "MESSAGE : $cmd $target service:$sname"
+	echo "MESSAGE : $cmd service:$sname"
 	echo systemctl $cmd $sname
 	systemctl $cmd $sname
 }

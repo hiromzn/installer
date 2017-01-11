@@ -37,7 +37,7 @@ main()
 	. $INST_DIR/env/os.env
 	. $INST_DIR/env/$PRODUCT.env
 	
-	JBOSS_TESTAP="/tmp/$JBOSS_TESTAP_FNAME";
+	JBOSS_TESTAP="$WORK_DIR/$JBOSS_TESTAP_FNAME";
 
 	confdir=$INST_DIR/conf/$PRODUCT
 
@@ -139,13 +139,13 @@ clean_jboss()
 #------------------
 prepare_jdbc_driver()
 {
-	JBOSS_JDBC_DRIVER="/tmp/$JBOSS_JDBC_DRIVER_FNAME";
+	JBOSS_JDBC_DRIVER="$WORK_DIR/$JBOSS_JDBC_DRIVER_FNAME";
         cp $JBOSS_JDBC_DRIVER_ARCHIVE $JBOSS_JDBC_DRIVER;
         chmod o+r $JBOSS_JDBC_DRIVER;
 }
 clean_jdbc_driver()
 {
-	JBOSS_JDBC_DRIVER="/tmp/$JBOSS_JDBC_DRIVER_FNAME";
+	JBOSS_JDBC_DRIVER="$WORK_DIR/$JBOSS_JDBC_DRIVER_FNAME";
 	rm $JBOSS_JDBC_DRIVER;
 }
 
@@ -287,11 +287,15 @@ wait_startup()
 	do
 		echo -n ".";
 		sleep 1;
-		grep WFLYSRV0051 $log >/dev/null
-		if [ "$?" -eq 0 ]; then
-			url=`grep WFLYSRV0051 $log |tail -1 |sed 's[.* \(http://.*\) .*[\1['`;
-			echo "MESSAGE : JBoss $JBOSS_SERVER_NAME console url($url) is ready !";
-			return 0;
+		if [ -s "$log" ]
+		then
+			set +e
+			grep WFLYSRV0051 $log >/dev/null
+			if [ "$?" -eq 0 ]; then
+				url=`grep WFLYSRV0051 $log |tail -1 |sed 's[.* \(http://.*\) .*[\1['`;
+				echo "MESSAGE : JBoss $JBOSS_SERVER_NAME console url($url) is ready !";
+				return 0;
+			fi
 		fi
 	done
 }

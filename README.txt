@@ -44,6 +44,15 @@ $ sudo ./mkall config
 $ sudo ./mkall deploy
 
 ---------------------
+controle user/group
+---------------------
+# add all user/group
+$ sudo ./usergroup-all setup
+
+# del all user/group
+$ sudo ./usergroup-all clean
+
+---------------------
 how to clean
 ---------------------
 # stop all httpd and jboss processes
