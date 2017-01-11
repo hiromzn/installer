@@ -199,12 +199,14 @@ add_jboss_default_group()
 cd /core-service=management/access=authorization
 :write-attribute(name=provider,value=rbac)
 reload
-./role-mapping=Monitor:add
-./role-mapping=Monitor/include=group-$JBOSS_MONITOR_GROUP:add(name=$JBOSS_MONITOR_GROUP,type=Group)
-./role-mapping=Deployer:add
-./role-mapping=Deployer/include=group-$JBOSS_DEPLOYER_GROUP:add(name=$JBOSS_DEPLOYER_GROUP,type=Group)
-./role-mapping=SuperUser/include=group-$JBOSS_SUPERUSER_GROUP:add(name=$JBOSS_SUPERUSER_GROUP,type=Group)
+./role-mapping=$JBOSS_ADMIN_ROLE/include=group-$JBOSS_GROUP:add(name=$JBOSS_GROUP,type=Group)
 EOF
+
+#OFF# ./role-mapping=$JBOSS_MONITOR_ROLE:add
+#OFF# ./role-mapping=$JBOSS_MONITOR_ROLE/include=group-$JBOSS_MONITOR_GROUP:add(name=$JBOSS_MONITOR_GROUP,type=Group)
+#OFF# ./role-mapping=$JBOSS_DEPLOYER_ROLE:add
+#OFF# ./role-mapping=$JBOSS_DEPLOYER_ROLE/include=group-$JBOSS_DEPLOYER_GROUP:add(name=$JBOSS_DEPLOYER_GROUP,type=Group)
+
 }
 
 add_jboss_user()
@@ -213,9 +215,9 @@ add_jboss_user()
 	cmd="$JBOSS_HOME/bin/add-user.sh";
 	conf="$shome/configuration/";
 
-	$cmd -sc $conf -u $JBOSS_MONITOR_USER -p $JBOSS_USER_PASSWORD -g $JBOSS_MONITOR_GROUP
-	$cmd -sc $conf -u $JBOSS_DEPLOYER_USER -p $JBOSS_USER_PASSWORD -g $JBOSS_DEPLOYER_GROUP
-	$cmd -sc $conf -u $JBOSS_ADMIN -p $JBOSS_USER_PASSWORD -g $JBOSS_SUPERUSER_GROUP
+	#OFF# $cmd -sc $conf -u $JBOSS_MONITOR_USER -p $JBOSS_USER_PASSWORD -g $JBOSS_MONITOR_GROUP
+	#OFF# $cmd -sc $conf -u $JBOSS_DEPLOYER_USER -p $JBOSS_USER_PASSWORD -g $JBOSS_DEPLOYER_GROUP
+	$cmd -sc $conf -u $JBOSS_USER -p $JBOSS_USER_PASSWORD -g $JBOSS_GROUP
 }
 
 setup_jdbc_driver()
