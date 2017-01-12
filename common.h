@@ -148,10 +148,12 @@ create_firewall_conf_script() # cmd confname
 
 	mkdir -p $SCRIPT_DIR;
 
+	(
+	echo "firewall-cmd --reload";
 	for confname in $list
 	do
 		create_firewall_conf_cmd_script $cmd $confname
-	done >$SCRIPT_DIR/fw.$skind.$cmd.sh
+	done )>$SCRIPT_DIR/fw.$skind.$cmd.sh
 	chmod 755 $SCRIPT_DIR/fw.$skind.$cmd.sh
 }
 

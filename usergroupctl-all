@@ -7,6 +7,9 @@ MYARGS="$*";
 main()
 {
 	action="$1";
+
+	mkdir -p $HOME_BASE_DIR;
+
 	case "$action" in
 	setup ) add_all ;;
 	clean ) del_all ;;

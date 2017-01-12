@@ -10,6 +10,9 @@ main()
 {
 	cmd="$1";
 	case "$1" in
+	reload )
+		firewall-cmd --reload;
+		;;
 	listp )
 		firewall-cmd --list-ports $FIREWALL_CMD_OPT;
 		;;
@@ -33,6 +36,8 @@ usage: $0 command
 command:
 	add <service_name>
 	remove <service_name>
+
+	reload
 
 	lists .... list services
 	listp .... list ports

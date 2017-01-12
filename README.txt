@@ -58,6 +58,10 @@ $ sudo ./fw.http-all.add.sh
 # setup for jboss service port
 $ sudo ./fw.jboss-all.add.sh
 
+# check active services
+$ sudo ./fw.controle.sh lists
+http-LXa ftp dhcpv6-client ssh http-LEa jboss-LEa jboss-LXa ...
+
 ### DB serer ###
 $ sudo ./fw.db.add.sh
 

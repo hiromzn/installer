@@ -72,7 +72,7 @@ mk_os_env() # iname num
 		-e 's[__OS_USER_ID__['${uid}'[g' \
 		-e 's[__OS_GROUP_NAME__['${iname}OG'[g' \
 		-e 's[__OS_GROUP_ID__['${gid}'[g' \
-		-e 's[__OS_USER_HOME__['/$PROJ_NAME/home/${iname}'[g' \
+		-e 's[__OS_USER_HOME__['$HOME_BASE_DIR/${iname}'[g' \
 		;
 }
 

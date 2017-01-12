@@ -72,9 +72,15 @@ all()
 
 archive()
 {
-	cp mod_jk/tomcat-connectors-1.2.42.tar $ARCHIVE_DIR;
-	cp test/testap/app.war $ARCHIVE_DIR;
-	( cd $ARCHIVE_DIR; tar xf tomcat-connectors-1.2.42.tar )
+	if [ ! -s "$ARCHIVE_DIR/app.war" ]
+	then
+		cp test/testap/app.war $ARCHIVE_DIR;
+	fi	
+	if [ ! -d "$ARCHIVE_DIR/tomcat-connectors-1.2.42" ]
+	then
+		cp mod_jk/tomcat-connectors-1.2.42.tar $ARCHIVE_DIR;
+		( cd $ARCHIVE_DIR; tar xf tomcat-connectors-1.2.42.tar )
+	fi
 }
 
 deploy()
