@@ -156,7 +156,19 @@ jboss_conf_filter() # void
                 -e "s[__JBOSS_PORT_OFFSET__[$JBOSS_PORT_OFFSET[g" \
                 -e "s[__JBOSS_BIND_ADDR__[$JBOSS_BIND_ADDR[g" \
                 -e "s[__JBOSS_MGMT_ADDR__[$JBOSS_MGMT_ADDR[g" \
+		\
+		-e "s[__JBOSS_PORT_AJP__[$JBOSS_PORT_AJP[g" \
+		-e "s[__JBOSS_PORT_HTTP__[$JBOSS_PORT_HTTP[g" \
+		-e "s[__JBOSS_PORT_HTTPS__[$JBOSS_PORT_HTTPS[g" \
+		-e "s[__JBOSS_PORT_JACORB__[$JBOSS_PORT_JACORB[g" \
+		-e "s[__JBOSS_PORT_JACORB_SSL__[$JBOSS_PORT_JACORB_SSL[g" \
+		-e "s[__JBOSS_PORT_MESSAGING__[$JBOSS_PORT_MESSAGING[g" \
+		-e "s[__JBOSS_PORT_TXN_RECOVERY__[$JBOSS_PORT_TXN_RECOVERY[g" \
+		-e "s[__JBOSS_PORT_TXN_STATUS__[$JBOSS_PORT_TXN_STATUS[g" \
+		-e "s[__JBOSS_PORT_MANAGE_HTTP__[$JBOSS_PORT_MANAGE_HTTP[g" \
+		-e "s[__JBOSS_PORT_MANAGE_HTTPS__[$JBOSS_PORT_MANAGE_HTTPS[g" \
                 ;
+
 }
 
 mk_conf_systemctl_jboss() # envfile

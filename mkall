@@ -6,8 +6,6 @@ MYARGS="$*";
 
 . ./common.h
 
-set -eu
-
 usage()
 {
 cat <<EOF
@@ -93,6 +91,7 @@ setup()
 	./sysctl-all setup jboss
 	./sysctl-all enable httpd
 	./sysctl-all enable jboss
+	./mkfirewall
 }
 
 start()

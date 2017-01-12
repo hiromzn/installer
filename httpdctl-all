@@ -3,6 +3,7 @@ MYNAME="$0";
 MYARGS="$*";
 
 . ./common.env
+. ./common.h
 
 main()
 {
@@ -10,6 +11,7 @@ main()
 
 	case "$cmd" in
 	setup ) setup ;;
+	fwscript ) fwscript ;;
 	clean ) clean ;;
 	start | stop | enable | disable | status ) cmd $cmd ;;
 	esac
@@ -21,6 +23,12 @@ setup()
 	do
 		./httpdctl setup $envdir;
 	done
+	fwscript;
+}
+
+fwscript()
+{
+	make_firewall_script http;
 }
 
 clean()

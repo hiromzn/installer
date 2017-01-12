@@ -116,3 +116,71 @@ mk_base_dir() # path
 	fi
 }
 
+#######################
+# firewall
+#######################
+
+FIREWALL_CMD_OPT="--zone=public";
+
+make_firewall_script() # kind
+{
+	kind="$1";
+	list="";
+	for d in $OUTPUT_DIR/*;
+	do
+		list="$list $kind-`basename $d`";
+		if [ "$kind" = "http" ]; then
+			#OFF# list="$list https-`basename $d`";
+			:
+		fi
+	done
+	log "creating $kind firewall script : $list";
+	create_firewall_conf_script "add" $kind-all $list;
+	create_firewall_conf_script "remove" $kind-all $list;
+}
+
+create_firewall_conf_script() # cmd confname
+{
+	cmd="$1";
+	skind="$2";
+	shift; shift;
+	list="$*";
+
+	mkdir -p $SCRIPT_DIR;
+
+	for confname in $list
+	do
+		create_firewall_conf_cmd_script $cmd $confname
+	done >$SCRIPT_DIR/fw.$skind.$cmd.sh
+	chmod 755 $SCRIPT_DIR/fw.$skind.$cmd.sh
+}
+
+create_firewall_conf_cmd_script() # cmd confname
+{
+	cmd="$1";
+	confname="$2";
+
+	#OFF# check_conf_file $confname;
+
+	echo firewall-cmd --$cmd-service=$confname --zone=public
+	echo firewall-cmd --$cmd-service=$confname --zone=public --permanent
+}
+
+#####
+##### Please run by root user !!!!!!
+#####
+check_conf_file() # confname
+{
+	confname="$1";
+	conffilesys="$FIREWALL_BASE_CONF_DIR/$confname.xml"
+	if [ ! -s "$conffilesys" ]
+	then
+		conffilelocal="$FIREWALL_CONF_DIR/$confname.xml"
+		if [ ! -s "$conffilelocal" ]
+		then
+			error "ERROR : firewall config name:$confname is invalid!"
+			error "        check $conffilesys or $conffilelocal file."
+			exit 1;
+		fi
+	fi
+}

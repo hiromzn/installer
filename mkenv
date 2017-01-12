@@ -100,11 +100,14 @@ mk_httpd_env() # iname num
 		-e 's[__HEADER_ARGS__['"$MYARGS"'[g' \
 		-e 's[__HEADER_DATE__['`date $DATE_TIME_FMT`'[g' \
 		-e 's[__HTTPD_TOPDIR__['${topdir}'[g' \
-		-e 's[__HTTPD_PORT_HTTP__['${listenport}'[g' \
-		-e 's[__HTTPD_PORT_HTTPS__['${listensslport}'[g' \
 		-e 's[__HTTPD_WORKER_SERVER1_PORT__['${workerport}'[g' \
 		-e 's[__HTTPD_USER__['${OS_USER_NAME}'[g' \
 		-e 's[__HTTPD_GROUP__['${OS_GROUP_NAME}'[g' \
+		\
+		-e 's[__HTTPD_FW_CONF_HTTP_NAME__['http-${iname}'[g' \
+		-e 's[__HTTPD_FW_CONF_HTTPS_NAME__['https-${iname}'[g' \
+		-e 's[__HTTPD_PORT_HTTP__['${listenport}'[g' \
+		-e 's[__HTTPD_PORT_HTTPS__['${listensslport}'[g' \
 		;
 }
 
@@ -134,14 +137,21 @@ mk_jboss_env() # iname num
 	sname="${iname}A";
 	javahome="`get_java_home`";
 
-	JBOSS_PORT_OFFSET_BASE_OFFSET=100
+	poffset="`expr $JBOSS_PORT_OFFSET_BASE_OFFSET \* \( $num + 1 \)`";
 
-	JBOSS_WEB_PORT_BASE=8080
-	JBOSS_ADMIN_PORT_BASE=9990
+#OFF# JBOSS_WEB_PORT_BASE=8080
+#OFF# JBOSS_ADMIN_PORT_BASE=9990
 
-	portoffset="`expr $JBOSS_PORT_OFFSET_BASE_OFFSET \* \( $num + 1 \)`";
-	webport="`expr $JBOSS_WEB_PORT_BASE + $portoffset`";
-	adminport="`expr $JBOSS_ADMIN_PORT_BASE + $portoffset`";
+	pajp="`expr $JBOSS_PORT_AJP_DEF + $poffset`";
+	phttp="`expr $JBOSS_PORT_HTTP_DEF + $poffset`";
+	phttps="`expr $JBOSS_PORT_HTTPS_DEF + $poffset`";
+	pjacorb="`expr $JBOSS_PORT_JACORB_DEF + $poffset`";
+	pjacorbs="`expr $JBOSS_PORT_JACORB_SSL_DEF + $poffset`";
+	pmessage="`expr $JBOSS_PORT_MESSAGING_DEF + $poffset`";
+	ptxnrec="`expr $JBOSS_PORT_TXN_RECOVERY_DEF + $poffset`";
+	ptxnst="`expr $JBOSS_PORT_TXN_STATUS_DEF + $poffset`";
+	pmanage="`expr $JBOSS_PORT_MANAGE_HTTP_DEF + $poffset`";
+	pmanages="`expr $JBOSS_PORT_MANAGE_HTTPS_DEF + $poffset`";
 
 	JBOSS_DS_SERVER_NAME="127.0.0.1";
 
@@ -154,9 +164,9 @@ mk_jboss_env() # iname num
 		-e 's[__JBOSS_SERVER_NAME__['${sname}'[g' \
 		-e 's[__JBOSS_JAVA_HOME__['${javahome}'[g' \
 		\
-		-e 's[__JBOSS_PORT_OFFSET__['${portoffset}'[g' \
-		-e 's[__JBOSS_WEB_PORT__['${webport}'[g' \
-		-e 's[__JBOSS_ADMIN_PORT__['${adminport}'[g' \
+		-e 's[__JBOSS_PORT_OFFSET__['${poffset}'[g' \
+		-e 's[__JBOSS_WEB_PORT__['${phttp}'[g' \
+		-e 's[__JBOSS_ADMIN_PORT__['${pmanage}'[g' \
 		\
 		-e 's[__JBOSS_USER__['${iname}AU'[g' \
 		-e 's[__JBOSS_GROUP__['${iname}AG'[g' \
@@ -165,6 +175,19 @@ mk_jboss_env() # iname num
 		-e 's[__JBOSS_DS_SERVER_NAME__['${JBOSS_DS_SERVER_NAME}'[g' \
 		-e 's[__JBOSS_DS_DB_NAME__['${iname}DB'[g' \
 		-e 's[__JBOSS_DS_USER_NAME__['${iname}DU'[g' \
+		\
+		-e 's[__JBOSS_FW_CONF_JBOSS_NAME__['jboss-${iname}'[g' \
+		\
+		-e 's[__JBOSS_PORT_AJP__['${pajp}'[g' \
+		-e 's[__JBOSS_PORT_HTTP__['${phttp}'[g' \
+		-e 's[__JBOSS_PORT_HTTPS__['${phttps}'[g' \
+		-e 's[__JBOSS_PORT_JACORB__['${pjacorb}'[g' \
+		-e 's[__JBOSS_PORT_JACORB_SSL__['${pjacorbs}'[g' \
+		-e 's[__JBOSS_PORT_MESSAGING__['${pmessage}'[g' \
+		-e 's[__JBOSS_PORT_TXN_RECOVERY__['${ptxnrec}'[g' \
+		-e 's[__JBOSS_PORT_TXN_STATUS__['${ptxnst}'[g' \
+		-e 's[__JBOSS_PORT_MANAGE_HTTP__['${pmanage}'[g' \
+		-e 's[__JBOSS_PORT_MANAGE_HTTPS__['${pmanages}'[g' \
 		;
 }
 

@@ -48,42 +48,40 @@ main()
 	. $INST_DIR/env/os.env
 	. $INST_DIR/env/$PRODUCT.env
 
-case "$cmd" in
-##### setup ######
-setup )
-	setup $INST_DIR;
-	;;
+	case "$cmd" in
+	setup )
+		setup $INST_DIR;
+		;;
 
-"check" )
-	for n in ${INST_LIST[@]}
-	do
-		echo "##### INSTANCE $n : diff httpd.conf"
+	check )
+		for n in ${INST_LIST[@]}
+		do
+			echo "##### INSTANCE $n : diff httpd.conf"
 
-		ls -ld `get_httpd_topdir $n`;
-		ls -ld `get_httpd_logdir_abs $n`;
-		ls -ld `get_httpd_rundir_abs $n`;
-		wwwroot="`get_httpd_wwwroot $n`";
-		ls -ld $wwwroot
-		ls -ld $wwwroot/*
+			ls -ld `get_httpd_topdir $n`;
+			ls -ld `get_httpd_logdir_abs $n`;
+			ls -ld `get_httpd_rundir_abs $n`;
+			wwwroot="`get_httpd_wwwroot $n`";
+			ls -ld $wwwroot
+			ls -ld $wwwroot/*
 
-		echo "--- check $HTTPD_ORG_TOPDIR-$n/conf/httpd.conf"
-		grep -e ^ServerRoot -e ^Document -e ^Listen -e ^PidFile -e ^DefaultRuntimeDir $HTTPD_ORG_TOPDIR-$n/conf/httpd.conf
-	done
-	;;
-"clean" )
-	rmdir_force $HTTPD_TOPDIR;
-	;;
+			echo "--- check $HTTPD_ORG_TOPDIR-$n/conf/httpd.conf"
+			grep -e ^ServerRoot -e ^Document -e ^Listen -e ^PidFile -e ^DefaultRuntimeDir $HTTPD_ORG_TOPDIR-$n/conf/httpd.conf
+		done
+		;;
+	clean )
+		rmdir_force $HTTPD_TOPDIR;
+		;;
 
-##### controle process ######
-checkps )
-	ps -ef |grep httpd
-	;;
+	checkps )
+		ps -ef |grep httpd
+		;;
 
--? | * )
-	usage;
-	exit 1;
-	;;
-esac
+	-? | * )
+		usage;
+		exit 1;
+		;;
+	esac
 }
 
 get_apache_version()
@@ -148,6 +146,10 @@ setup() # instdir
 		chown $OS_USER_NAME:$OS_GROUP_NAME $f;
 		chmod $HTTPD_CONF_FILE_MOD $f;
 	done
+
+	# firewall
+	cp $confdir/http.xml $FIREWALL_CONF_DIR/$HTTPD_FW_CONF_HTTP_NAME.xml
+	#OFF# cp $confdir/https.xml $FIREWALL_CONF_DIR/$HTTPD_FW_CONF_HTTPS_NAME.xml
 
   # REMOVE SSL config
 	sslconf="$HTTPD_CONFD/ssl.conf";

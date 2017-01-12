@@ -3,7 +3,7 @@
   <short>JBossEAP (ports)</short>
   <description>JBoss EAP port : ajp, http, https, jacorb, jacorb-ssl, messaging, txn-recovery, txn-status, management-http, management-https</description>
   <port protocol="tcp" port="__JBOSS_PORT_AJP__"/>
-  <port protocol="tcp" port="__JBOSS_PORT_HTTP"/>
+  <port protocol="tcp" port="__JBOSS_PORT_HTTP__"/>
   <port protocol="tcp" port="__JBOSS_PORT_HTTPS__"/>
   <port protocol="tcp" port="__JBOSS_PORT_JACORB__"/>
   <port protocol="tcp" port="__JBOSS_PORT_JACORB_SSL__"/>
