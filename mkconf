@@ -112,7 +112,7 @@ httpd_conf_filter() # void
                 -e "s[__HTTPD_DOCUMENT_ROOT__[${HTTPD_DOC_ROOT}[g" \
                 -e "s[__HTTPD_WWW_ROOT__[${HTTPD_WWW_ROOT}[g" \
                 -e "s[__HTTPD_CGI_ROOT__[${HTTPD_CGI_ROOT}[g" \
-                -e "s[__HTTPD_LISTEN__[${HTTPD_PORT_HTTP}[g" \
+                -e "s[__HTTPD_LISTEN__[${HTTPD_LISTEN_IP}:${HTTPD_PORT_HTTP}[g" \
                 -e "s[__HTTPD_USER__[${HTTPD_USER}[g" \
                 -e "s[__HTTPD_GROUP__[${HTTPD_GROUP}[g" \
                 -e "s[__HTTPD_CORE_DUMP_DIR__[${HTTPD_CORE_DUMP_DIR}[" \
