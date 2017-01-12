@@ -119,6 +119,9 @@ httpd_conf_filter() # void
                 -e "s[__HTTPD_WORKER_SERVER1_HOST__[${HTTPD_WORKER_SERVER1_HOST}[" \
                 -e "s[__HTTPD_WORKER_SERVER1_PORT__[${HTTPD_WORKER_SERVER1_PORT}[" \
                 -e "s[__HTTPD_CONF_FILE__[${HTTPD_CONF_FILE}[" \
+		\
+                -e "s[__HTTPD_PORT_HTTP__[${HTTPD_PORT_HTTP}[g" \
+                -e "s[__HTTPD_PORT_HTTPS__[${HTTPD_PORT_HTTPS}[g" \
                 ;
 }
 

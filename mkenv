@@ -84,13 +84,15 @@ mk_httpd_env() # iname num
 
 	. $NEW_ENV/os.env
 
-	HTTPD_PORT_HTTP_BASE=81
+	HTTPD_PORT_HTTP_BASE=81		# default(=80) + 1
+	HTTPD_PORT_HTTPS_BASE=444	# default(=443) + 1
 
 	HTTPD_WORKER_SERVER1_PORT_BASE=8109	# DEFAULT + OFFSET
 	HTTPD_WORKER_SERVER1_PORT_OFFSET=100
 
 	topdir="$OS_USER_HOME/opt/httpd";
 	listenport="`expr $HTTPD_PORT_HTTP_BASE + $num`";
+	listensslport="`expr $HTTPD_PORT_HTTPS_BASE + $num`";
 	workerport="`expr $HTTPD_WORKER_SERVER1_PORT_BASE + $HTTPD_WORKER_SERVER1_PORT_OFFSET \* $num`";
 
 	sed \
@@ -99,6 +101,7 @@ mk_httpd_env() # iname num
 		-e 's[__HEADER_DATE__['`date $DATE_TIME_FMT`'[g' \
 		-e 's[__HTTPD_TOPDIR__['${topdir}'[g' \
 		-e 's[__HTTPD_PORT_HTTP__['${listenport}'[g' \
+		-e 's[__HTTPD_PORT_HTTPS__['${listensslport}'[g' \
 		-e 's[__HTTPD_WORKER_SERVER1_PORT__['${workerport}'[g' \
 		-e 's[__HTTPD_USER__['${OS_USER_NAME}'[g' \
 		-e 's[__HTTPD_GROUP__['${OS_GROUP_NAME}'[g' \
