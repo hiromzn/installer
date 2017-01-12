@@ -43,6 +43,33 @@ $ sudo ./mkall config
 # deploy test ap into jboss
 $ sudo ./mkall deploy
 
+----------------------------------------
+setup firewall (open port for services)
+----------------------------------------
+### WEB/AP server ###
+$ cd ./script/
+
+# setup for os service port
+$ sudo ./fw.ap.add.sh
+
+# setup for http service port
+$ sudo ./fw.http-all.add.sh
+
+# setup for jboss service port
+$ sudo ./fw.jboss-all.add.sh
+
+### DB serer ###
+$ sudo ./fw.db.add.sh
+
+### OTHER serer ###
+$ sudo ./fw.common.add.sh
+
+-------------------------------------------------
+clean firewall config (close port for services)
+-------------------------------------------------
+# run remove.sh, please !
+$ sudo ./fw.***.remove.sh
+
 ---------------------
 controle user/group
 ---------------------
