@@ -74,10 +74,10 @@ $ sudo ./fw.***.remove.sh
 controle user/group
 ---------------------
 # add all user/group
-$ sudo ./usergroup-all setup
+$ sudo ./usergroupctl-all setup
 
 # del all user/group
-$ sudo ./usergroup-all clean
+$ sudo ./usergroupctl-all clean
 
 ---------------------
 how to clean

@@ -7,6 +7,8 @@
 . ./common.env
 . ./common.h
 
+set +eu
+
 usage()
 {
 cat <<EOF

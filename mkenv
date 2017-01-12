@@ -173,7 +173,7 @@ mk_jboss_env() # iname num
 		\
 		-e 's[__JBOSS_DS_NAME__['${iname}DS'[g' \
 		-e 's[__JBOSS_DS_SERVER_NAME__['${JBOSS_DS_SERVER_NAME}'[g' \
-		-e 's[__JBOSS_DS_DB_NAME__['${iname}DB'[g' \
+		-e 's[__JBOSS_DS_DB_NAME__['${iname}D'[g' \
 		-e 's[__JBOSS_DS_USER_NAME__['${iname}DU'[g' \
 		\
 		-e 's[__JBOSS_FW_CONF_JBOSS_NAME__['jboss-${iname}'[g' \
