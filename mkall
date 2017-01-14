@@ -97,7 +97,7 @@ setup()
 	./sysctl-all setup jboss
 	./sysctl-all enable httpd
 	./sysctl-all enable jboss
-	./mkfirewall
+	./fwctl setup
 }
 
 start()

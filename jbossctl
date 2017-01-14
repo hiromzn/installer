@@ -23,6 +23,7 @@ command :
   start
   stop
   checkps
+  checkds
 EOF
 }
 #####################
@@ -48,9 +49,12 @@ main()
 	case "$cmd" in
 	setup )
 		install_jboss;
-		create_jboss_inst;
-		create_jboss_config;
+		create_jboss_inst $confdir;
+		fwsetup $confdir;
 		;;
+
+	fwsetup ) fwsetup $confdir ;;
+	fwclean ) fwclean ;;
 
 	check )
 		ls -ld $JBOSS_HOME;
@@ -85,9 +89,8 @@ main()
 		add_jboss_user;
 		;;
 
-	checkps )
-		ps -ef |grep httpd
-		;;
+	checkps ) ps -ef |grep httpd ;;
+	checkds ) check_data_source ;;
 
 	-? | * )
 		usage;
@@ -115,8 +118,9 @@ install_jboss()
 	)
 }
 
-create_jboss_inst()
+create_jboss_inst() # confdir
 {
+	confdir="$1";
 	confdirpath="`pwd`/$confdir";
 	(
 		cd $JBOSS_HOME;
@@ -133,17 +137,20 @@ create_jboss_inst()
 	)
 }
 
-create_jboss_config()
-{
-	confdirpath="`pwd`/$confdir";
-
-	cp $confdir/jboss.xml $FIREWALL_CONF_DIR/$JBOSS_FW_CONF_JBOSS_NAME.xml
-}
-
 clean_jboss()
 {
 	echo "removing jboss : $JBOSS_HOME ..."
 	rm -rf $JBOSS_HOME
+}
+
+fwsetup() # confdir
+{
+	confdir="$1";
+	cp $confdir/jboss.xml $FIREWALL_CONF_DIR/$JBOSS_FW_CONF_JBOSS_NAME.xml
+}
+fwclean()
+{
+	rm -f $FIREWALL_CONF_DIR/$JBOSS_FW_CONF_JBOSS_NAME.xml
 }
 
 #------------------

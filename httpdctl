@@ -49,9 +49,10 @@ main()
 	. $INST_DIR/env/$PRODUCT.env
 
 	case "$cmd" in
-	setup )
-		setup $INST_DIR;
-		;;
+	setup ) setup $INST_DIR ;;
+
+	fwsetup ) fwsetup $INST_DIR ;;
+	fwclean ) fwclean ;;
 
 	check )
 		for n in ${INST_LIST[@]}
@@ -122,10 +123,27 @@ setup_welcomepage_for_test() # confdir
 	fi
 }
 
+#
+# firewall
+#
+fwsetup() # instdir
+{
+	instdir="$1";
+	confdir=$instdir/conf/$PRODUCT
+
+	cp $confdir/http.xml $FIREWALL_CONF_DIR/$HTTPD_FW_CONF_HTTP_NAME.xml
+	#OFF# cp $confdir/https.xml $FIREWALL_CONF_DIR/$HTTPD_FW_CONF_HTTPS_NAME.xml
+}
+
+fwclean()
+{
+	rm -f $FIREWALL_CONF_DIR/$HTTPD_FW_CONF_HTTP_NAME.xml
+}
+
 setup() # instdir
 {
-	instdir=$INST_DIR;
-	echo "setup $PRODUCT by $INST_DIR"
+	instdir="$1";
+	echo "setup $PRODUCT by $instdir"
 
   # HTTPD_TOPDIR : cleanup and create
 	mk_base_dir $HTTPD_TOPDIR;
@@ -148,8 +166,7 @@ setup() # instdir
 	done
 
 	# firewall
-	cp $confdir/http.xml $FIREWALL_CONF_DIR/$HTTPD_FW_CONF_HTTP_NAME.xml
-	#OFF# cp $confdir/https.xml $FIREWALL_CONF_DIR/$HTTPD_FW_CONF_HTTPS_NAME.xml
+	fwsetup $instdir;
 
   # REMOVE SSL config
 	sslconf="$HTTPD_CONFD/ssl.conf";

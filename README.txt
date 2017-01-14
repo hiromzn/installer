@@ -47,7 +47,7 @@ $ sudo ./mkall deploy
 setup firewall (open port for services)
 ----------------------------------------
 ### WEB/AP server ###
-$ cd ./script/
+$ cd ./script/fw/
 
 # setup for os service port
 $ sudo ./fw.ap.add.sh
@@ -129,12 +129,12 @@ $ sudo ./mkall clean
 		logs/check.jboss.log
 
    : mkfirewall
-	./$SCRIPT_DIR/
+	./fwctl		# controle script for firewall (setup/clean/etc...)
+	./$SCRIPT_DIR/fw/
 		./fw.ap.add.sh		# add FW config of web/ap server
 		./fw.ap.remove.sh	# remove FW config of web/ap server
 		./fw.db.add.sh		# add FW config of DB server
 		./fw.db.remove.sh	# remove FW config of DB server
 		./fw.common.add.sh	# add FW config of common server
 		./fw.common.remove.sh	# remove FW config of common server
-		./fw.controle.sh
 

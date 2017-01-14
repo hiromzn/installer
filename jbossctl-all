@@ -12,7 +12,6 @@ main()
 	case "$cmd" in
 	setup ) setup ;;
 	clean ) clean ;;
-	fwscript ) fwscript ;;
 	start | stop | adduser | addconfig | wait | deploy )
 		cmd $cmd ;;
 	* ) 
@@ -28,12 +27,6 @@ setup()
 	do
 		./jbossctl setup $envdir;
 	done
-	fwscript;
-}
-
-fwscript()
-{
-	make_firewall_script jboss;
 }
 
 clean()
