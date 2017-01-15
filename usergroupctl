@@ -2,6 +2,9 @@
 # usergroupctl : user and group controle
 #
 
+. ./common.env
+. ./common.h
+
 main() # action envfile
 {
 	action="$1";
@@ -10,7 +13,7 @@ main() # action envfile
 	envfile="$instdir/env/os.env";
 
 	if [ ! -s "$envfile" ]; then
-		echo "ERROR: check $envfile !!!!"
+		pr_error "check $envfile !!!!"
 		exit 1;
 	fi
 

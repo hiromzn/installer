@@ -3,6 +3,7 @@ MYNAME="$0";
 MYARGS="$*";
 
 . ./common.env
+. ./common.h
 
 BASE_CONF="./conf.base";
 
@@ -39,7 +40,7 @@ main()
 				|sed 's[\(.*\)/$[\1[' \
 				|sed 's[$[/conf[' `";
 
-	echo "MESSAGE : make config files for $envdir into $NEW_CONF";
+	message "make config files for $envdir into $NEW_CONF";
 
 	os_envfile="$envdir/os.env";
 
@@ -71,7 +72,7 @@ check_envdir() # envdir
 		fi
 	done
 	if [ "$flag" -eq 0 ]; then
-		echo "ERROR: $envdir does NOT have ($TGT_ENV).env"
+		pr_error "$envdir does NOT have ($TGT_ENV).env"
 	fi
 }
 

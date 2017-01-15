@@ -32,13 +32,22 @@ debug()
 		echo "DEBUG: $*";
 	fi
 }
+get_date_str() { echo "`date $DATE_TIME_FMT`"; }
+message() # messages...
+{
+	echo "msg: " $*;
+}
 log() # messages...
 {
-	echo "LOG:`date $DATE_TIME_FMT`:" $*
+	echo "LOG:`get_date_str`: " $*
 }
-error() # messages....
+pr_error() # messages....
 {
-	echo "ERROR:" $* 1>&2;
+	prstderr "ERROR:`get_date_str`: " $*;
+}
+prstderr() # messages....
+{
+	echo "$*" 1>&2;
 }
 
 #######################
@@ -50,12 +59,12 @@ check_java()
 	java -version 2>&1 |grep 'openjdk ' >/dev/null
 	if [ "$?" -ne 0 ]
 	then
-		echo "ERROR: check java install for openjdk"
-		echo "   check:"
-		echo "       $ which java"
-		echo "       $ java -version"
-		echo "   install:"
-		echo "       $ sudo yum –y install java-1.8.0-openjdk-devel"
+		pr_error "check java install for openjdk"
+		prstderr "   check:"
+		prstderr "       $ which java"
+		prstderr "       $ java -version"
+		prstderr "   install:"
+		prstderr "       $ sudo yum –y install java-1.8.0-openjdk-devel"
 		exit 1;
 	fi
 }
@@ -67,14 +76,14 @@ check_enforce()
 	if [ "$?" -ne 0 ]
 	then
 		now="`getenforce`";
-		echo "ERROR: check SELinux mode in Permissive (now:$now)"
-		echo "   check:"
-		echo "       $ getenforce"
-		echo "   change dinamic config:"
-		echo "       $ sudo setenforce 0"
-		echo "   change static:"
-		echo "       $ sudo vi  /etc/selinux/config"
-		echo "       SELINUX=permissive"
+		pr_error "check SELinux mode in Permissive (now:$now)"
+		prstderr "   check:"
+		prstderr "       $ getenforce"
+		prstderr "   change dinamic config:"
+		prstderr "       $ sudo setenforce 0"
+		prstderr "   change static:"
+		prstderr "       $ sudo vi  /etc/selinux/config"
+		prstderr "       SELINUX=permissive"
 		exit 1;
 	fi
 }
@@ -95,7 +104,7 @@ rmdir_force()
 {
 	cdir=$1;
 
-	echo "LOG: remove dir : rm -rf $cdir"
+	log "LOG: remove dir : rm -rf $cdir"
 	rm -rf $cdir
 }
 
@@ -112,7 +121,7 @@ mk_base_dir() # path
 		rmdir $path
 	)
 	else
-		echo "message : $path directory already exists."
+		log "message : $path directory already exists."
 	fi
 }
 

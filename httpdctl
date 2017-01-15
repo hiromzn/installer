@@ -100,12 +100,12 @@ install_mod_jk()
         bin=$ARCHIVE_DIR/tomcat-connectors-1.2.42/native/apache-2.0/mod_jk.so 
 
         if [ -s "$bin" ]; then
-                echo "MESSAGE: installing $bin to $modjkpath"
+                log "installing $bin to $modjkpath"
                 cp $bin $modjkpath
                 chmod 755 $modjkpath
                 chown $OS_USER_NAME:$OS_GROUP_NAME $modjkpath
         else
-                echo "ERROR: check $bin file...."
+                pr_error "check $bin file...."
         fi
 }
 
@@ -119,7 +119,7 @@ setup_welcomepage_for_test() # confdir
 		chown $OS_USER_NAME:$OS_GROUP_NAME $target
 		chmod 644 $target
 	else
-		debug "MESSAGE : no $src : check this file."
+		error "setup_welcomepage_for_test(): no $src : check this file."
 	fi
 }
 

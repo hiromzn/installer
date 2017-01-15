@@ -25,72 +25,92 @@ how to RUN
 $ hostanme
 <WEB_AP_server>
 
-# make all environment files into output/<instance_name>/env directory.
-$ ./mkenv-all
+// make all environment files into output/<instance_name>/env directory.
+// make all config files into output/<instance_name>/conf directory.
+// make all script for setup
+// create tar package for DB and BATCH server setup
 
-# make all config files into output/<instance_name>/conf directory.
-$ ./mkconf-all
+$ ./prepare all
 
-# setup all instance of osuser/group, install jboss, setup httpd, systemctl of httpd/jboss and enable service.
-$ sudo ./mkall setup
+// copy tar package to DB and BATCH server.
+$ scp ../installer-package.tar <DB_SERVER>:
+$ scp ../installer-package.tar <BATCH_SERVER>:
 
-# start all instance of httpd and jboss 
-$ sudo ./mkall start
+// change to root
+$ sudo bash
+password:
+#
 
-# do config of jboss using jboss-cli.sh
-$ sudo ./mkall config
+// setup all instance of osuser/group, install jboss, setup httpd, systemctl of httpd/jboss and enable service.
+# ./mkall setup
 
-# deploy test ap into jboss
-$ sudo ./mkall deploy
+// start all instance of httpd and jboss 
+# ./mkall start
+
+// do config of jboss using jboss-cli.sh
+# ./mkall config
+
+// deploy test ap into jboss
+# ./mkall deploy
 
 ----------------------------------------
 setup firewall (open port for services)
 ----------------------------------------
 ### WEB/AP server ###
-$ cd ./script/fw/
 
-# setup for os service port
-$ sudo ./fw.ap.add.sh
+// setup for os service port
+$ sudo ./script/fw/fw.ap.add.sh
 
-# setup for http service port
-$ sudo ./fw.http-all.add.sh
+// setup for http service port
+$ sudo ./script/fw/fw.http-all.add.sh
 
-# setup for jboss service port
-$ sudo ./fw.jboss-all.add.sh
+// setup for jboss service port
+$ sudo ./script/fw.jboss-all.add.sh
 
-# check active services
-$ sudo ./fw.controle.sh lists
+// check active services
+$ sudo ./fwctl lists
 http-LXa ftp dhcpv6-client ssh http-LEa jboss-LEa jboss-LXa ...
 
 ### DB serer ###
-$ sudo ./fw.db.add.sh
 
-### OTHER serer ###
-$ sudo ./fw.common.add.sh
+$ mkdir installer
+$ cd installer
+$ tar xf $HOME/installer-package.tar
+$ sudo ./script/fw/fw.db.add.sh
+
+### BATCH serer ###
+
+$ mkdir installer
+$ cd installer
+$ tar xf $HOME/installer-package.tar
+$ sudo ./script/fw/fw.common.add.sh
 
 -------------------------------------------------
 clean firewall config (close port for services)
 -------------------------------------------------
-# run remove.sh, please !
-$ sudo ./fw.***.remove.sh
+// run remove.sh, please !
+$ sudo ./script/fw/fw.***.remove.sh
 
 ---------------------
 controle user/group
 ---------------------
-# add all user/group
+// add all user/group
 $ sudo ./usergroupctl-all setup
 
-# del all user/group
+// del all user/group
 $ sudo ./usergroupctl-all clean
 
 ---------------------
 how to clean
 ---------------------
-# stop all httpd and jboss processes
+// stop all httpd and jboss processes
 $ sudo ./mkall stop
 
-# clean up all config file, installation (user/group, httpd, jboss, systemd) and disable all services of httpd/jboss.
+// clean up all config file, installation (user/group, httpd, jboss, systemd) and disable all services of httpd/jboss.
 $ sudo ./mkall clean
+
+// cleanup environment / config / script directory.
+$ ./prepare clean
 
 --------------------------------
  directory structure & scripts
@@ -106,7 +126,7 @@ $ sudo ./mkall clean
 
    : mkenv
 
-   	./$OUTPUT_DIR/
+   	./$INSTANCE_DIR/
 	    <INST_NAME>/
 		env/
 			os, httpd, jboss, systemctl[httpd/jboss]

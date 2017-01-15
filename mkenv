@@ -27,11 +27,11 @@ main()
 	iname=$1;
 	num=$2;
 
-	NEW_ENV="$OUTPUT_DIR/$iname/env";
+	NEW_ENV="$INSTANCE_DIR/$iname/env";
 
 	mkdir -p "$NEW_ENV";
 
-	echo "MESSAGE: creating $iname:$num environment files into $NEW_ENV"
+	message "creating $iname:$num environment files into $NEW_ENV"
 
 	check_java;
 
@@ -47,10 +47,10 @@ main()
 			jboss ) mk_jboss_env $iname $num ;;
 			systemctl.jboss ) mk_systemctl_env "jboss" $iname $num ;;
 			systemctl.httpd ) mk_systemctl_env "httpd" $iname $num ;;
-			* ) echo "ERROR: $envname case string is NOT defined in $MYNAME:main()" 1>&2; exit 1;;
+			* ) pr_error "$envname case string is NOT defined in $MYNAME:main()" 1>&2; exit 1;;
 			esac >$NEW_ENV/$envname.env
 		else
-			"ERROR: $bfile is NOT exist";
+			pr_error "$bfile is NOT exist";
 			exit 1;
 		fi
 	done
@@ -118,10 +118,10 @@ get_java_home() # void
 		jh="`ls -l $ljava |sed 's/.*-> //' |sed 's[/bin/java[['`";
 		echo $jh
 	else
-		echo "ERROR: can NOT find out JAVA_HOME directory"
-		echo "check: "
-		echo "    $ which java"
-		echo "    $ ls -l $ljava"
+		pr_error "Can NOT find out JAVA_HOME directory"
+		prstderr "check: "
+		prstderr "    $ which java"
+		prstderr "    $ ls -l $ljava"
 		exit 1;
 	fi
 }

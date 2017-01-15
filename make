@@ -37,7 +37,7 @@ main()
 
 ci()
 {
-	rm -rf "${OUTPUT_DIR}";
+	rm -rf "${INSTANCE_DIR}";
 	rm -rf "${SCRIPT_DIR}";
 	git add -A
 	git commit

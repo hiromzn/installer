@@ -8,14 +8,12 @@ MYARGS="$*";
 FW_CMD="firewall-cmd";
 FW_CMD_OPT="--zone=public";
 
-FW_SCRIPT_DIR="$SCRIPT_DIR/fw";
-
 main()
 {
 	cmd="$1";
 	case "$1" in
 
-	setup ) setup ;;
+	mkscript ) mkscript ;;
 	clean ) clean ;;
 
 	reload )
@@ -55,13 +53,13 @@ EOF
 	esac
 }
 
-setup()
+mkscript()
 {
 	make_firewall_script http;
 	make_firewall_script jboss;
-	mkscript ap $FIREWALL_BASE_CONF_AP
-        mkscript db $FIREWALL_BASE_CONF_DB
-        mkscript common $FIREWALL_BASE_CONF_COMMON
+	make_script ap $FIREWALL_BASE_CONF_AP
+        make_script db $FIREWALL_BASE_CONF_DB
+        make_script common $FIREWALL_BASE_CONF_COMMON
 }
 
 clean()
@@ -69,7 +67,7 @@ clean()
 	rm -rf $FW_SCRIPT_DIR;
 }
 
-mkscript() # server_kind confname_list.....
+make_script() # server_kind confname_list.....
 {
         log "creating firewall config script for $1 server into $FW_SCRIPT_DIR";
         mkdir -p "$FW_SCRIPT_DIR";
@@ -81,7 +79,7 @@ make_firewall_script() # kind
 {
 	kind="$1";
 	list="";
-	for d in $OUTPUT_DIR/*;
+	for d in $INSTANCE_DIR/*;
 	do
 		list="$list $kind-`basename $d`";
 		if [ "$kind" = "http" ]; then
@@ -125,8 +123,8 @@ check_conf_file() # confname
 		conffilelocal="$FIREWALL_CONF_DIR/$confname.xml"
 		if [ ! -s "$conffilelocal" ]
 		then
-			error "ERROR : firewall config name:$confname is invalid!"
-			error "        check $conffilesys or $conffilelocal file."
+			pr_error "firewall config name:$confname is invalid!"
+			prstderr "        check $conffilesys or $conffilelocal file."
 			exit 1;
 		fi
 	fi

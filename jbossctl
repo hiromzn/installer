@@ -254,7 +254,7 @@ EOF
 setup_data_source()
 {
 	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
-	echo "MESSAGE: JBoss setup Data source for $JBOSS_DS_NAME"
+	log "JBoss setup Data source for $JBOSS_DS_NAME"
 	su - $OS_USER_NAME -c "$jbosscli" <<EOF
 data-source add --name=$JBOSS_DS_NAME --driver-name=postgresql --connection-url=jdbc:postgresql://$JBOSS_DS_SERVER_NAME:$JBOSS_DS_SERVER_PORT/$JBOSS_DS_DB_NAME --jndi-name=java:jboss/datasources/$JBOSS_DS_NAME --user-name=$JBOSS_DS_USER_NAME --password=$JBOSS_DS_PASSWORD
 data-source --name=$JBOSS_DS_NAME --max-pool-size=20
@@ -270,7 +270,7 @@ EOF
 check_data_source()
 {
 	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
-	echo "MESSAGE: JBoss CHECK Data source for $JBOSS_DS_NAME"
+	log "JBoss CHECK Data source for $JBOSS_DS_NAME"
 	su - $OS_USER_NAME -c "$jbosscli" <<EOF
 data-source test-connection-in-pool --name=$JBOSS_DS_NAME
 EOF
@@ -279,7 +279,7 @@ EOF
 setup_jboss_transaction()
 {
 	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
-	echo "MESSAGE: JBoss setup transaction for $JBOSS_SERVER_NAME"
+	log "JBoss setup transaction for $JBOSS_SERVER_NAME"
 	su - $OS_USER_NAME -c "$jbosscli" <<EOF
 /subsystem=transactions:write-attribute(name=default-timeout,value=$JBOSS_TRAN_TIMEOUT)
 reload
@@ -301,7 +301,7 @@ wait_startup()
 {
 	# wait admin console port ready
 	log="$JBOSS_SERVER_HOME/log/server.log";
-	echo "MESSAGE : waiting JBosss $JBOSS_SERVER_NAME admin console port"
+	message "waiting JBosss $JBOSS_SERVER_NAME admin console port"
 	while [ true ]
 	do
 		echo -n ".";
@@ -312,7 +312,7 @@ wait_startup()
 			grep WFLYSRV0051 $log >/dev/null
 			if [ "$?" -eq 0 ]; then
 				url=`grep WFLYSRV0051 $log |tail -1 |sed 's[.* \(http://.*\) .*[\1['`;
-				echo "MESSAGE : JBoss $JBOSS_SERVER_NAME console url($url) is ready !";
+				message "JBoss $JBOSS_SERVER_NAME console url($url) is ready !";
 				return 0;
 			fi
 		fi

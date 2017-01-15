@@ -97,7 +97,6 @@ setup()
 	./sysctl-all setup jboss
 	./sysctl-all enable httpd
 	./sysctl-all enable jboss
-	./fwctl setup
 }
 
 start()
@@ -135,9 +134,9 @@ cmd()
 	cmd="$1";
 	kind="$2";
 
-	for envdir in $OUTPUT_DIR/*;
+	for envdir in $INSTANCE_DIR/*;
 	do
-		echo "message : $cmd $envdir";
+		log "message : $cmd $envdir";
 	done
 }
 
@@ -153,10 +152,10 @@ check_env()
 
 check_output_dir()
 {
-	if [ ! -d "$OUTPUT_DIR" ]
+	if [ ! -d "$INSTANCE_DIR" ]
 	then
-		echo "ERROR: OUTPUT_DIR(=$OUTPUT_DIR) environment is invalid !";
-		echo "       check common.env file or OUTPUT_DIR env value.";
+		pr_error "INSTANCE_DIR(=$INSTANCE_DIR) environment is invalid !";
+		prstderr "       check common.env file or INSTANCE_DIR env value.";
 		exit 1;
 	fi
 }
@@ -166,7 +165,7 @@ check_run_user()
 	runid="$1";
 	if [ "`id -un`" != $runid ];
 	then
-		echo "ERROR: please run this script using \"$runid\" account !"
+		pr_error "please run this script using \"$runid\" account !"
 		exit 1;
 	fi
 }
@@ -177,8 +176,8 @@ check_install_httpd()
 
 	if [ ! -x "$bin" ];
 	then
-		echo "ERROR: check \"$bin\" executable file !"
-		echo "       install $bin file by \"yum install httpd\" command."
+		pr_error "check \"$bin\" executable file !"
+		prstderr "       install $bin file by \"yum install httpd\" command."
 		exit 1;
 	fi
 }
@@ -193,7 +192,7 @@ check_archive_files()
 	do
 		if [ ! -s "$ARCHIVE_DIR/$f" ]
 		then
-			echo "ERROR: check $ARCHIVE_DIR/$f file."
+			pr_error "check $ARCHIVE_DIR/$f file."
 			exit 1;
 		fi
 	done

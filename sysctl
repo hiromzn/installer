@@ -59,10 +59,10 @@ main()
 
 	case "$cmd" in
 	setup )
-		echo "creating $kind instance of systemctl : $confdir"
+		log "creating $kind instance of systemctl : $confdir"
 		create_sysconfigfile $kind;
 		create_servicefile $kind;
-		echo "MESSAGE: systemctl daemon-reload"
+		message "systemctl daemon-reload"
 		systemctl daemon-reload;
 		;;
 
@@ -109,7 +109,7 @@ create_servicefile() # kind
 	if [ -s "$sfile_base" ]; then
 		cp $sfile_base $SERVICE_FILE;
 	else
-		echo "ERROR: $sfile_base does NOT exists."
+		pr_error "$sfile_base does NOT exists."
 		exit 1;
 	fi
 }
@@ -138,8 +138,7 @@ do_cmd_instance() # cmd(start/stop/etc...)
 
 	sname=$SERVICE_NAME
 
-	echo "MESSAGE : $cmd service:$sname"
-	echo systemctl $cmd $sname
+	log "[sysctl] run systemctl $cmd $sname"
 	systemctl $cmd $sname
 }
 

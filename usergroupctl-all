@@ -24,7 +24,7 @@ main()
 
 add_all()
 {
-	for instdir in $OUTPUT_DIR/*;
+	for instdir in $INSTANCE_DIR/*;
 	do
 		echo $instdir
 		./usergroupctl addgroup $instdir
@@ -34,7 +34,7 @@ add_all()
 
 del_all()
 {
-	for instdir in $OUTPUT_DIR/*;
+	for instdir in $INSTANCE_DIR/*;
 	do
 		echo $instdir
 		./usergroupctl deluser $instdir

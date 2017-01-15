@@ -15,7 +15,7 @@ main()
 	start | stop | adduser | addconfig | wait | deploy )
 		cmd $cmd ;;
 	* ) 
-		echo "ERROR: bad command : $cmd : $MYNAME";
+		pr_error "bad command : $cmd : $MYNAME";
 		exit 1;
 		;;
 	esac
@@ -23,7 +23,7 @@ main()
 
 setup()
 {
-	for envdir in $OUTPUT_DIR/*;
+	for envdir in $INSTANCE_DIR/*;
 	do
 		./jbossctl setup $envdir;
 	done
@@ -31,7 +31,7 @@ setup()
 
 clean()
 {
-	for envdir in $OUTPUT_DIR/*;
+	for envdir in $INSTANCE_DIR/*;
 	do
 		./jbossctl clean $envdir;
 	done
@@ -41,7 +41,7 @@ cmd()
 {
 	cmd="$1";
 
-	for envdir in $OUTPUT_DIR/*;
+	for envdir in $INSTANCE_DIR/*;
 	do
 		./jbossctl $cmd $envdir;
 	done
