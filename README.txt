@@ -4,8 +4,11 @@ before RUN
 $ tar xf <this_tool_package>.tar
 
 $ cd installer
+
 $ vi common.env
 ARCHIVE_DIR=${ARCHIVE_DIR:="<your_archive_dirctory_path>"}
+PG_SERVER_NAME=<DB_server_host_name>
+PG_DB_USER_PASSWORD=<PostgreSQL_db_user_password>
 
 $ ./mkall archive
 
@@ -117,20 +120,33 @@ $ ./prepare clean
 --------------------------------
 
    TOOL_HOME/
-		common.env
-		common.h
+		common.env .... common environment value
+		common.h ...... common fuctions
+
 		env.base/
 			httpd, jboss, systemctl[httpd/jboss]
+
+			## RULE ##
+				ENV_NAME=__ENV_NAME__ ... depend on instance.
+				ENV_NAME=$OTHER_ENV ..... NO depend on instance.
+				ENV_NAME="VALUE" ........ NO depend on instance.
+
 		conf.base/
 			httpd, jboss, systemctl[httpd/jboss], testapp
 
    : mkenv
+	## RULE ##
+		replace __ENV_NAME__ --> value_of_each_instance
 
    	./$INSTANCE_DIR/
 	    <INST_NAME>/
 		env/
 			os, httpd, jboss, systemctl[httpd/jboss]
    : mkconf
+	## RULE ##
+		1. evaluate *.env file.
+		2. create config file using *.env file
+
 		conf/
 			httpd, jboss, systemctl[httpd/jboss]
 

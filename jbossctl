@@ -256,7 +256,7 @@ setup_data_source()
 	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
 	log "JBoss setup Data source for $JBOSS_DS_NAME"
 	su - $OS_USER_NAME -c "$jbosscli" <<EOF
-data-source add --name=$JBOSS_DS_NAME --driver-name=postgresql --connection-url=jdbc:postgresql://$JBOSS_DS_SERVER_NAME:$JBOSS_DS_SERVER_PORT/$JBOSS_DS_DB_NAME --jndi-name=java:jboss/datasources/$JBOSS_DS_NAME --user-name=$JBOSS_DS_USER_NAME --password=$JBOSS_DS_PASSWORD
+data-source add --name=$JBOSS_DS_NAME --driver-name=postgresql --connection-url=jdbc:postgresql://$JBOSS_DB_SERVER_NAME:$JBOSS_DB_SERVER_PORT/$JBOSS_DB_DB_NAME --jndi-name=java:jboss/datasources/$JBOSS_DS_NAME --user-name=$JBOSS_DB_USER_NAME --password=$JBOSS_DB_PASSWORD
 data-source --name=$JBOSS_DS_NAME --max-pool-size=20
 data-source --name=$JBOSS_DS_NAME --min-pool-size=5
 data-source --name=$JBOSS_DS_NAME --pool-prefill=true

@@ -153,8 +153,6 @@ mk_jboss_env() # iname num
 	pmanage="`expr $JBOSS_PORT_MANAGE_HTTP_DEF + $poffset`";
 	pmanages="`expr $JBOSS_PORT_MANAGE_HTTPS_DEF + $poffset`";
 
-	JBOSS_DS_SERVER_NAME="127.0.0.1";
-
 	sed \
 		-e 's[__HEADER_SCRIPT__['$MYNAME'[g' \
 		-e 's[__HEADER_ARGS__['"$MYARGS"'[g' \
@@ -172,9 +170,8 @@ mk_jboss_env() # iname num
 		-e 's[__JBOSS_GROUP__['${iname}AG'[g' \
 		\
 		-e 's[__JBOSS_DS_NAME__['${iname}DS'[g' \
-		-e 's[__JBOSS_DS_SERVER_NAME__['${JBOSS_DS_SERVER_NAME}'[g' \
-		-e 's[__JBOSS_DS_DB_NAME__['${iname}D'[g' \
-		-e 's[__JBOSS_DS_USER_NAME__['${iname}DU'[g' \
+		-e 's[__JBOSS_DB_DB_NAME__['${iname}D'[g' \
+		-e 's[__JBOSS_DB_USER_NAME__['${iname}DU'[g' \
 		\
 		-e 's[__JBOSS_FW_CONF_JBOSS_NAME__['jboss-${iname}'[g' \
 		\
