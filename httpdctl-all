@@ -1,0 +1,46 @@
+
+MYNAME="$0";
+MYARGS="$*";
+
+. ./common.env
+. ./common.h
+
+main()
+{
+	cmd="$1";
+
+	case "$cmd" in
+	setup ) setup ;;
+	clean ) clean ;;
+	start | stop | enable | disable | status ) cmd $cmd ;;
+	esac
+}
+
+setup()
+{
+	for envdir in $INSTANCE_DIR/*;
+	do
+		./httpdctl setup $envdir;
+	done
+}
+
+clean()
+{
+	for envdir in $INSTANCE_DIR/*;
+	do
+		./httpdctl clean $envdir;
+	done
+}
+
+cmd()
+{
+	cmd="$1";
+
+	for envdir in $INSTANCE_DIR/*;
+	do
+		./httpdctl $cmd $envdir;
+	done
+}
+
+main $*;
+

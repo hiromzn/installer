@@ -1,0 +1,51 @@
+
+MYNAME="$0";
+MYARGS="$*";
+
+. ./common.env
+. ./common.h
+
+main()
+{
+	cmd="$1";
+
+	case "$cmd" in
+	setup ) setup ;;
+	clean ) clean ;;
+	start | stop | adduser | addconfig | wait | deploy )
+		cmd $cmd ;;
+	* ) 
+		pr_error "bad command : $cmd : $MYNAME";
+		exit 1;
+		;;
+	esac
+}
+
+setup()
+{
+	for envdir in $INSTANCE_DIR/*;
+	do
+		./jbossctl setup $envdir;
+	done
+}
+
+clean()
+{
+	for envdir in $INSTANCE_DIR/*;
+	do
+		./jbossctl clean $envdir;
+	done
+}
+
+cmd()
+{
+	cmd="$1";
+
+	for envdir in $INSTANCE_DIR/*;
+	do
+		./jbossctl $cmd $envdir;
+	done
+}
+
+main $*;
+

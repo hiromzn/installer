@@ -1,0 +1,106 @@
+#
+# usergroupctl : user and group controle
+#
+
+. ./common.env
+. ./common.h
+
+main() # action envfile
+{
+	action="$1";
+	instdir="$2";
+
+	envfile="$instdir/env/os.env";
+
+	if [ ! -s "$envfile" ]; then
+		pr_error "check $envfile !!!!"
+		exit 1;
+	fi
+
+	. $envfile
+
+	case $action in
+
+	addgroup ) add_group ;;
+	delgroup ) del_group ;;
+
+	addgroupadmin ) group_admin_user "add" $OS_GROUP_NAME ;;
+	delgroupadmin ) group_admin_user "del" $OS_GROUP_NAME ;;
+
+	adduser ) add_user ;;
+	deluser ) del_user ;;
+
+	* ) usage ;;
+	esac
+}
+
+usage()
+{
+cat <<EOF
+usage : $0 command <instance_dir>
+
+command :
+	addgroup
+	delgroup
+	adduser
+	deluser
+EOF
+}
+
+add_group()
+{
+	message "groupadd -g $OS_GROUP_ID $OS_GROUP_NAME"
+	groupadd -g $OS_GROUP_ID $OS_GROUP_NAME
+	group_admin_user "add" $OS_GROUP_NAME;
+}
+
+group_admin_user() # action gname
+{
+	action="$1";
+	gname="$2";
+	isadmin="`cat /etc/passwd |sed -e "/^$PROJ_OS_ADMIN_NAME:/p" -e d |wc -l`";
+	if [ "$isadmin" -eq 1 ]
+	then
+		case $action in
+		add ) opt="-a" ;;
+		del ) opt="-d" ;;
+		* ) 
+			pr_error "bad action:$action check group_admin_user() argument..."
+			exit 1;
+			;;
+		esac
+		message "$action $PROJ_OS_ADMIN_NAME user in $gname"
+		gpasswd $opt $PROJ_OS_ADMIN_NAME $gname
+	else
+		message "user $PROJ_OS_ADMIN_NAME is NOT in /etc/passwd"
+	fi
+}
+
+del_group()
+{
+	message "groupdel $OS_GROUP_NAME"
+	groupdel $OS_GROUP_NAME
+	group_admin_user "del" $OS_GROUP_NAME;
+}
+
+add_user()
+{
+	message "useradd -u $OS_USER_ID -d $OS_USER_HOME -g $OS_GROUP_ID $OS_USER_NAME"
+	useradd -u $OS_USER_ID -d $OS_USER_HOME -g $OS_GROUP_ID $OS_USER_NAME
+	chmod -R $OS_USER_HOME_PERMIT $OS_USER_HOME
+
+	message "set password : $OS_USER_NAME <-- $OS_USER_PASSWORD"
+	passwd $OS_USER_NAME <<EOF
+$OS_USER_PASSWORD
+$OS_USER_PASSWORD
+EOF
+}
+
+del_user()
+{
+	message "userdel -r -f $OS_USER_NAME"
+	userdel -r -f $OS_USER_NAME
+}
+
+main $*;
+

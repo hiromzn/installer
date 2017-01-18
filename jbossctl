@@ -1,0 +1,352 @@
+#
+# jbossctl : jboss controle
+#
+# controle multiple jboss eap instance
+#
+
+. ./common.env
+. ./common.h
+
+set +eu
+
+usage()
+{
+cat <<EOF
+controle multiple jboss instance
+
+usage : $0 command <INSTANCE_DIR>
+
+command : 
+  setup
+  clean
+  check
+  start
+  stop
+  checkps
+  checkds
+EOF
+}
+#####################
+#
+# main
+#
+#####################
+main()
+{
+	if [ "$#" -ne 2 ]; then usage; exit 1; fi
+
+        cmd="$1";
+        INST_DIR="$2";
+        PRODUCT="jboss";
+
+	. $INST_DIR/env/os.env
+	. $INST_DIR/env/$PRODUCT.env
+	
+	JBOSS_TESTAP="$WORK_DIR/$JBOSS_TESTAP_FNAME";
+
+	confdir=$INST_DIR/conf/$PRODUCT
+
+	case "$cmd" in
+	setup )
+		install_jboss;
+		create_jboss_inst $confdir;
+		fwsetup $confdir;
+		;;
+
+	fwsetup ) fwsetup $confdir ;;
+	fwclean ) fwclean ;;
+
+	check )
+		ls -ld $JBOSS_HOME;
+		check_port;
+		;;
+
+	wait )
+		wait_startup
+		;;
+
+	clean )
+		echo "CLEANING: instance $JBOSS_SERVER_NAME"
+		clean_jboss;
+		;;
+
+	deploy ) # script development test
+		prepare_testap;
+		deploy_testap;
+		clean_testap;
+		;;
+
+	addconfig )
+		prepare_jdbc_driver;
+		addconfig_set;
+		clean_jdbc_driver;
+		;;
+
+	adduser )
+		echo "add default group : $JBOSS_SERVER_NAME"
+		add_jboss_default_group;
+		echo "add user : $JBOSS_SERVER_NAME"
+		add_jboss_user;
+		;;
+
+	checkps ) ps -ef |grep httpd ;;
+	checkds ) check_data_source ;;
+
+	-? | * )
+		usage;
+		exit 1;
+		;;
+	esac
+}
+###############
+# functions
+###############
+
+install_jboss()
+{
+	echo "installing jboss : $JBOSS_INSTALL_ARCHIVE -> $JBOSS_HOME ..."
+	(
+		mkdir -p $JBOSS_HOME;
+		cd $JBOSS_HOME
+		cd ..
+		rmdir $JBOSS_HOME
+		unzip $JBOSS_INSTALL_ARCHIVE >/dev/null
+		if [ $JBOSS_INSTALL_NAME != $JBOSS_HOME_NAME ]; then
+			mv $JBOSS_INSTALL_NAME $JBOSS_HOME_NAME;
+		fi
+		chown -R $OS_USER_NAME:$OS_GROUP_NAME $JBOSS_HOME
+	)
+}
+
+create_jboss_inst() # confdir
+{
+	confdir="$1";
+	confdirpath="`pwd`/$confdir";
+	(
+		cd $JBOSS_HOME;
+
+		cp -rp ./standalone $JBOSS_SERVER_NAME
+		mkdir $JBOSS_SERVER_NAME/bin
+
+		cp $confdirpath/$JBOSS_CONF_FNAME $JBOSS_SERVER_NAME/bin
+		cp $confdirpath/$JBOSS_RUN_FNAME $JBOSS_SERVER_NAME/bin
+
+		chmod $JBOSS_RUN_PERM $JBOSS_SERVER_NAME/bin/$JBOSS_RUN_FNAME
+
+		chown -R $OS_USER_NAME:$OS_GROUP_NAME $JBOSS_SERVER_NAME
+	)
+}
+
+clean_jboss()
+{
+	echo "removing jboss : $JBOSS_HOME ..."
+	rm -rf $JBOSS_HOME
+}
+
+fwsetup() # confdir
+{
+	confdir="$1";
+	cp $confdir/jboss.xml $FIREWALL_CONF_DIR/$JBOSS_FW_CONF_JBOSS_NAME.xml
+}
+fwclean()
+{
+	rm -f $FIREWALL_CONF_DIR/$JBOSS_FW_CONF_JBOSS_NAME.xml
+}
+
+#------------------
+# data source
+#------------------
+prepare_jdbc_driver()
+{
+	JBOSS_JDBC_DRIVER="$WORK_DIR/$JBOSS_JDBC_DRIVER_FNAME";
+        cp $JBOSS_JDBC_DRIVER_ARCHIVE $JBOSS_JDBC_DRIVER;
+        chmod o+r $JBOSS_JDBC_DRIVER;
+}
+clean_jdbc_driver()
+{
+	JBOSS_JDBC_DRIVER="$WORK_DIR/$JBOSS_JDBC_DRIVER_FNAME";
+	rm $JBOSS_JDBC_DRIVER;
+}
+
+#------------------
+# test application
+#------------------
+prepare_testap()
+{
+        debug cp $JBOSS_TESTAP_ARCHIVE $JBOSS_TESTAP;
+        cp $JBOSS_TESTAP_ARCHIVE $JBOSS_TESTAP;
+        chmod o+r $JBOSS_TESTAP;
+}
+deploy_testap()
+{
+	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
+	su - $OS_USER_NAME -c "$jbosscli" <<EOF
+deploy $JBOSS_TESTAP
+EOF
+}
+clean_testap()
+{
+	debug rm $JBOSS_TESTAP;
+	rm $JBOSS_TESTAP;
+}
+
+#------------------
+# configuration
+#------------------
+setup_jboss_web_container()
+{
+	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
+	su - $OS_USER_NAME -c "$jbosscli" <<EOF
+/subsystem=undertow/server=default-server/ajp-listener=default-ajp:add(socket-binding=ajp)
+/subsystem=undertow/server=default-server/ajp-listener=default-ajp:write-attribute(name=no-request-timeout,value=$JBOSS_NO_REQUEST_TIMEOUT)
+/subsystem=undertow/server=default-server/ajp-listener=default-ajp:write-attribute(name=tcp-keep-alive,value=true)
+EOF
+}
+
+setup_jboss_io()
+{
+	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
+	su - $OS_USER_NAME -c "$jbosscli" <<EOF
+/subsystem=io/worker=default:write-attribute(name=task-max-threads,value=$JBOSS_TASK_MAX_THREADS)
+EOF
+}
+
+add_jboss_default_group()
+{
+	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
+	su - $OS_USER_NAME -c "$jbosscli" <<EOF
+cd /core-service=management/access=authorization
+:write-attribute(name=provider,value=rbac)
+reload
+./role-mapping=$JBOSS_ADMIN_ROLE/include=group-$JBOSS_GROUP:add(name=$JBOSS_GROUP,type=Group)
+EOF
+
+#OFF# ./role-mapping=$JBOSS_MONITOR_ROLE:add
+#OFF# ./role-mapping=$JBOSS_MONITOR_ROLE/include=group-$JBOSS_MONITOR_GROUP:add(name=$JBOSS_MONITOR_GROUP,type=Group)
+#OFF# ./role-mapping=$JBOSS_DEPLOYER_ROLE:add
+#OFF# ./role-mapping=$JBOSS_DEPLOYER_ROLE/include=group-$JBOSS_DEPLOYER_GROUP:add(name=$JBOSS_DEPLOYER_GROUP,type=Group)
+
+}
+
+add_jboss_user()
+{
+	shome=$JBOSS_SERVER_HOME;
+	cmd="$JBOSS_HOME/bin/add-user.sh";
+	conf="$shome/configuration/";
+
+	#OFF# $cmd -sc $conf -u $JBOSS_MONITOR_USER -p $JBOSS_USER_PASSWORD -g $JBOSS_MONITOR_GROUP
+	#OFF# $cmd -sc $conf -u $JBOSS_DEPLOYER_USER -p $JBOSS_USER_PASSWORD -g $JBOSS_DEPLOYER_GROUP
+	message "create JBoss user: name:$JBOSS_USER password:$JBOSS_USER_PASSWORD group:$JBOSS_GROUP"
+	$cmd -sc $conf -u $JBOSS_USER -p $JBOSS_USER_PASSWORD -g $JBOSS_GROUP
+	message "create JBoss admin: name:$JBOSS_ADMIN password:$JBOSS_ADMIN_PASSWORD group:$JBOSS_GROUP"
+	$cmd -sc $conf -u $JBOSS_ADMIN -p $JBOSS_ADMIN_PASSWORD -g $JBOSS_GROUP
+}
+
+setup_jdbc_driver()
+{
+	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
+	su - $OS_USER_NAME -c "$jbosscli" <<EOF
+module add \
+  --name=org.postgresql.jdbc \
+  --resources=$JBOSS_JDBC_DRIVER \
+  --dependencies=javax.api,javax.transaction.api
+/subsystem=datasources/jdbc-driver=$JBOSS_JDBC_DRIVER_NAME:\
+  add(driver-name=$JBOSS_JDBC_DRIVER_NAME,\
+      driver-module-name=org.postgresql.jdbc,\
+      driver-xa-datasource-class-name=$JBOSS_JDBC_DRIVER_XA_DS_CLASS_NAME)
+EOF
+}
+
+
+#OFF# setup_xa_data_source() # num name
+
+setup_data_source()
+{
+	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
+	log "JBoss setup Data source for $JBOSS_DS_NAME"
+	su - $OS_USER_NAME -c "$jbosscli" <<EOF
+data-source add \
+  --name=$JBOSS_DS_NAME \
+  --driver-name=$JBOSS_JDBC_DRIVER_NAME \
+  --connection-url=$JBOSS_DS_CONNECTION_URL \
+  --jndi-name=$JBOSS_DS_JNDI_NAME \
+  --user-name=$JBOSS_DB_USER_NAME \
+  --password=$JBOSS_DB_PASSWORD
+data-source --name=$JBOSS_DS_NAME --max-pool-size=$JBOSS_DS_MAX_POOL_SIZE
+data-source --name=$JBOSS_DS_NAME --min-pool-size=$JBOSS_DS_MIN_POOL_SIZE
+data-source --name=$JBOSS_DS_NAME --pool-prefill=$JBOSS_DS_POOL_PREFILL
+data-source --name=$JBOSS_DS_NAME --query-timeout=$JBOSS_DS_QUERY_TIMEOUT
+data-source --name=$JBOSS_DS_NAME \
+  --valid-connection-checker-class-name=$JBOSS_DS_VALID_CON_CHECKER_CLASS
+data-source --name=$JBOSS_DS_NAME \
+  --exception-sorter-class-name=$JBOSS_DS_EXCEPTION_SORTER_CLASS
+reload
+EOF
+}
+
+check_data_source()
+{
+	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
+	log "JBoss CHECK Data source for $JBOSS_DS_NAME"
+	su - $OS_USER_NAME -c "$jbosscli" <<EOF
+data-source test-connection-in-pool --name=$JBOSS_DS_NAME
+EOF
+}
+
+setup_jboss_transaction()
+{
+	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
+	log "JBoss setup transaction for $JBOSS_SERVER_NAME"
+	su - $OS_USER_NAME -c "$jbosscli" <<EOF
+/subsystem=transactions:write-attribute(name=default-timeout,value=$JBOSS_TRAN_TIMEOUT)
+reload
+/subsystem=transactions:write-attribute(name=node-identifier,value=$JBOSS_TRAN_NODEID)
+EOF
+}
+
+#######################
+# check
+#######################
+
+check_port()
+{
+	log="$JBOSS_SERVER_HOME/log/server.log";
+	grep -e WFLYUT0006 -e WFLYSRV0051 $log
+}
+
+wait_startup()
+{
+	# wait admin console port ready
+	log="$JBOSS_SERVER_HOME/log/server.log";
+	message "waiting JBosss $JBOSS_SERVER_NAME admin console port"
+	while [ true ]
+	do
+		echo -n ".";
+		sleep 1;
+		if [ -s "$log" ]
+		then
+			set +e
+			grep WFLYSRV0051 $log >/dev/null
+			if [ "$?" -eq 0 ]; then
+				url=`grep WFLYSRV0051 $log |tail -1 |sed 's[.* \(http://.*\) .*[\1['`;
+				message "JBoss $JBOSS_SERVER_NAME console url($url) is ready !";
+				return 0;
+			fi
+		fi
+	done
+}
+
+addconfig_set() # num inst
+{
+	echo "add web config : $JBOSS_SERVER_NAME"
+	setup_jboss_web_container;
+	echo "add io config : $JBOSS_SERVER_NAME"
+	setup_jboss_io
+	setup_jdbc_driver
+	setup_data_source
+	check_data_source
+	setup_jboss_transaction
+}
+
+main $*;
+

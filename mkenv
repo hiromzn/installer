@@ -1,0 +1,199 @@
+
+MYNAME="$0";
+MYARGS="$*";
+
+BASE_ENV="./env.base";
+
+. ./common.env
+. ./common.h
+
+usage()
+{
+cat <<EOF
+usage : $MYNAME <INST_NAME> <number>
+
+exsample of INST_NAME : LXa LEa LJa LVa SDa LXb LJb LVb SDb
+exsample of number    :   0   1   2   3   4   5   6   7   8
+
+number is used for port number offset;
+
+EOF
+}
+
+main()
+{
+	iname=$1;
+	num=$2;
+
+	NEW_ENV="$INSTANCE_DIR/$iname/env";
+
+	mkdir -p "$NEW_ENV";
+
+	message "creating $iname:$num environment files into $NEW_ENV"
+
+	check_java;
+
+	for envname in os httpd jboss systemctl.jboss systemctl.httpd
+	do
+		bfile="$BASE_ENV/$envname.env.BASE";
+		if [ -s "$bfile" ]
+		then
+		cat $bfile | \
+			case $envname in
+			os ) mk_os_env $iname $num ;;
+			httpd ) mk_httpd_env $iname $num ;;
+			jboss ) mk_jboss_env $iname $num ;;
+			systemctl.jboss ) mk_systemctl_env "jboss" $iname $num ;;
+			systemctl.httpd ) mk_systemctl_env "httpd" $iname $num ;;
+			* ) pr_error "$envname case string is NOT defined in $MYNAME:main()" 1>&2; exit 1;;
+			esac >$NEW_ENV/$envname.env
+		else
+			pr_error "$bfile is NOT exist";
+			exit 1;
+		fi
+	done
+}
+
+mk_os_env() # iname num
+{
+	iname="$1";
+	num="$2";
+
+	uname="${iname}OU";
+	uid="`expr $OS_USER_ID_BASE + $OS_USER_ID_OFFSET \* $num`";
+	gid="`expr $OS_GROUP_ID_BASE + $OS_GROUP_ID_OFFSET \* $num`";
+
+	sed \
+		-e 's[__HEADER_SCRIPT__['$MYNAME'[g' \
+		-e 's[__HEADER_ARGS__['"$MYARGS"'[g' \
+		-e 's[__HEADER_DATE__['`date $DATE_TIME_FMT`'[g' \
+		-e 's[__OS_USER_NAME__['$uname'[g' \
+		-e 's[__OS_USER_ID__['${uid}'[g' \
+		-e 's[__OS_USER_PASSWORD__['${uname}pass'[g' \
+		-e 's[__OS_GROUP_NAME__['${iname}OG'[g' \
+		-e 's[__OS_GROUP_ID__['${gid}'[g' \
+		-e 's[__OS_USER_HOME__['$HOME_BASE_DIR/${iname}'[g' \
+		;
+}
+
+mk_httpd_env() # iname num
+{
+	iname="$1";
+	num="$2";
+
+	. $NEW_ENV/os.env
+
+	topdir="$OS_USER_HOME/opt/httpd";
+	listenport="`expr $HTTPD_PORT_HTTP_BASE + $num`";
+	listensslport="`expr $HTTPD_PORT_HTTPS_BASE + $num`";
+
+	poffset="`expr $JOBSS_PORT_OFFSET + $JBOSS_PORT_OFFSET_BASE_OFFSET \* \( $num + 1 \)`";
+	pajp="`expr $JBOSS_PORT_AJP_DEF + $poffset`";
+
+	sed \
+		-e 's[__HEADER_SCRIPT__['$MYNAME'[g' \
+		-e 's[__HEADER_ARGS__['"$MYARGS"'[g' \
+		-e 's[__HEADER_DATE__['`date $DATE_TIME_FMT`'[g' \
+		-e 's[__HTTPD_TOPDIR__['${topdir}'[g' \
+		-e 's[__HTTPD_WORKER_SERVER1_PORT__['${pajp}'[g' \
+		-e 's[__HTTPD_USER__['${OS_USER_NAME}'[g' \
+		-e 's[__HTTPD_GROUP__['${OS_GROUP_NAME}'[g' \
+		\
+		-e 's[__HTTPD_FW_CONF_HTTP_NAME__['http-${iname}'[g' \
+		-e 's[__HTTPD_FW_CONF_HTTPS_NAME__['https-${iname}'[g' \
+		-e 's[__HTTPD_PORT_HTTP__['${listenport}'[g' \
+		-e 's[__HTTPD_PORT_HTTPS__['${listensslport}'[g' \
+		;
+}
+
+get_java_home() # void
+{
+	ljava=/etc/alternatives/java
+	if [ -s "$ljava" ]; then
+		jh="`ls -l $ljava |sed 's/.*-> //' |sed 's[/bin/java[['`";
+		echo $jh
+	else
+		pr_error "Can NOT find out JAVA_HOME directory"
+		prstderr "check: "
+		prstderr "    $ which java"
+		prstderr "    $ ls -l $ljava"
+		exit 1;
+	fi
+}
+
+mk_jboss_env() # iname num
+{
+	iname="$1";
+	num="$2";
+
+	. $NEW_ENV/os.env
+
+	jhome="$OS_USER_HOME/opt/\$JBOSS_HOME_NAME";
+	sname="${iname}A";
+	javahome="`get_java_home`";
+
+	poffset="`expr $JOBSS_PORT_OFFSET + $JBOSS_PORT_OFFSET_BASE_OFFSET \* \( $num + 1 \)`";
+
+	pajp="`expr $JBOSS_PORT_AJP_DEF + $poffset`";
+	phttp="`expr $JBOSS_PORT_HTTP_DEF + $poffset`";
+	phttps="`expr $JBOSS_PORT_HTTPS_DEF + $poffset`";
+	pjacorb="`expr $JBOSS_PORT_JACORB_DEF + $poffset`";
+	pjacorbs="`expr $JBOSS_PORT_JACORB_SSL_DEF + $poffset`";
+	pmessage="`expr $JBOSS_PORT_MESSAGING_DEF + $poffset`";
+	ptxnrec="`expr $JBOSS_PORT_TXN_RECOVERY_DEF + $poffset`";
+	ptxnst="`expr $JBOSS_PORT_TXN_STATUS_DEF + $poffset`";
+	pmanage="`expr $JBOSS_PORT_MANAGE_HTTP_DEF + $poffset`";
+	pmanages="`expr $JBOSS_PORT_MANAGE_HTTPS_DEF + $poffset`";
+
+	sed \
+		-e 's[__HEADER_SCRIPT__['$MYNAME'[g' \
+		-e 's[__HEADER_ARGS__['"$MYARGS"'[g' \
+		-e 's[__HEADER_DATE__['`date $DATE_TIME_FMT`'[g' \
+		\
+		-e 's[__JBOSS_HOME__['${jhome}'[g' \
+		-e 's[__JBOSS_SERVER_NAME__['${sname}'[g' \
+		-e 's[__JBOSS_JAVA_HOME__['${javahome}'[g' \
+		\
+		-e 's[__JBOSS_PORT_OFFSET__['${poffset}'[g' \
+		-e 's[__JBOSS_WEB_PORT__['${phttp}'[g' \
+		-e 's[__JBOSS_ADMIN_PORT__['${pmanage}'[g' \
+		\
+		-e 's[__JBOSS_USER__['${iname}AU'[g' \
+		-e 's[__JBOSS_GROUP__['${iname}AG'[g' \
+		\
+		-e 's[__JBOSS_DS_NAME__['${iname}DS'[g' \
+		-e 's[__JBOSS_DB_DB_NAME__['${iname}D'[g' \
+		-e 's[__JBOSS_DB_USER_NAME__['${iname}DU'[g' \
+		\
+		-e 's[__JBOSS_FW_CONF_JBOSS_NAME__['jboss-${iname}'[g' \
+		\
+		-e 's[__JBOSS_PORT_AJP__['${pajp}'[g' \
+		-e 's[__JBOSS_PORT_HTTP__['${phttp}'[g' \
+		-e 's[__JBOSS_PORT_HTTPS__['${phttps}'[g' \
+		-e 's[__JBOSS_PORT_JACORB__['${pjacorb}'[g' \
+		-e 's[__JBOSS_PORT_JACORB_SSL__['${pjacorbs}'[g' \
+		-e 's[__JBOSS_PORT_MESSAGING__['${pmessage}'[g' \
+		-e 's[__JBOSS_PORT_TXN_RECOVERY__['${ptxnrec}'[g' \
+		-e 's[__JBOSS_PORT_TXN_STATUS__['${ptxnst}'[g' \
+		-e 's[__JBOSS_PORT_MANAGE_HTTP__['${pmanage}'[g' \
+		-e 's[__JBOSS_PORT_MANAGE_HTTPS__['${pmanages}'[g' \
+		;
+}
+
+mk_systemctl_env() # kind iname num
+{
+	kind="$1"; # httpd or jboss
+	iname="$2";
+	num="$3";
+
+ 	sed \
+		-e 's[__HEADER_SCRIPT__['$MYNAME'[g' \
+		-e 's[__HEADER_ARGS__['"$MYARGS"'[g' \
+		-e 's[__HEADER_DATE__['`date $DATE_TIME_FMT`'[g' \
+		\
+		-e 's[__SYSCONFIG_NAME__['${kind}-${iname}'[g' \
+		;
+}
+
+main $*;
+

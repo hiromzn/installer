@@ -1,0 +1,20 @@
+
+MYNAME="$0";
+MYARGS="$*";
+
+. ./common.env
+
+set -eu
+
+main()
+{
+	num=0;
+	for envdir in $INSTANCE_DIR/*/env;
+	do
+		./mkconf $envdir;
+		num="`expr $num + 1`";
+	done
+}
+
+main $*;
+

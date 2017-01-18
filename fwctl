@@ -1,0 +1,134 @@
+
+MYNAME="$0";
+MYARGS="$*";
+
+. ./common.env
+. ./common.h
+
+FW_CMD="firewall-cmd";
+FW_CMD_OPT="--zone=public";
+
+main()
+{
+	cmd="$1";
+	case "$1" in
+
+	mkscript ) mkscript ;;
+	clean ) clean ;;
+
+	reload )
+		firewall-cmd --reload;
+		;;
+	listp )
+		firewall-cmd --list-ports $FIREWALL_CMD_OPT;
+		;;
+	lists )
+		firewall-cmd --list-services $FIREWALL_CMD_OPT;
+		;;
+	listdir )
+		ls -l /etc/firewalld/services/
+		;;
+	add | remove )
+		echo "firewall command:$cmd service:$2";
+		firewall-cmd --$cmd-service=$2 $FIREWALL_CMD_OPT
+		firewall-cmd --$cmd-service=$2 $FIREWALL_CMD_OPT --permanent
+		firewall-cmd --list-services $FIREWALL_CMD_OPT
+		firewall-cmd --list-ports $FIREWALL_CMD_OPT
+		;;
+	* )
+		cat <<EOF
+usage: $0 command
+
+command:
+	add <service_name>
+	remove <service_name>
+
+	reload
+
+	lists .... list services
+	listp .... list ports
+	listdir
+EOF
+		;;
+	esac
+}
+
+mkscript()
+{
+	make_firewall_script http;
+	make_firewall_script jboss;
+	make_script ap $FIREWALL_BASE_CONF_AP
+        make_script db $FIREWALL_BASE_CONF_DB
+        make_script common $FIREWALL_BASE_CONF_COMMON
+}
+
+clean()
+{
+	rm -rf $FW_SCRIPT_DIR;
+}
+
+make_script() # server_kind confname_list.....
+{
+        log "creating firewall config script for $1 server into $FW_SCRIPT_DIR";
+        mkdir -p "$FW_SCRIPT_DIR";
+        create_firewall_conf_script "add" $*
+        create_firewall_conf_script "remove" $*
+}
+
+make_firewall_script() # kind
+{
+	kind="$1";
+	list="";
+	for d in $INSTANCE_DIR/*;
+	do
+		list="$list $kind-`basename $d`";
+		if [ "$kind" = "http" ]; then
+			#OFF# list="$list https-`basename $d`";
+			:
+		fi
+	done
+	log "creating $kind firewall script : $list";
+	create_firewall_conf_script "add" $kind-all $list;
+	create_firewall_conf_script "remove" $kind-all $list;
+}
+
+create_firewall_conf_script() # cmd confname
+{
+	cmd="$1";
+	skind="$2";
+	shift; shift;
+	list="$*";
+
+	mkdir -p $FW_SCRIPT_DIR;
+
+	(
+	echo "$FW_CMD --reload";
+	for confname in $list
+	do
+		echo $FW_CMD --$cmd-service=$confname $FW_CMD_OPT
+		echo $FW_CMD --$cmd-service=$confname $FW_CMD_OPT --permanent
+	done )>$FW_SCRIPT_DIR/fw.$skind.$cmd.sh
+	chmod 755 $FW_SCRIPT_DIR/fw.$skind.$cmd.sh
+}
+
+#####
+##### Please run by root user !!!!!!
+#####
+check_conf_file() # confname
+{
+	confname="$1";
+	conffilesys="$FIREWALL_BASE_CONF_DIR/$confname.xml"
+	if [ ! -s "$conffilesys" ]
+	then
+		conffilelocal="$FIREWALL_CONF_DIR/$confname.xml"
+		if [ ! -s "$conffilelocal" ]
+		then
+			pr_error "firewall config name:$confname is invalid!"
+			prstderr "        check $conffilesys or $conffilelocal file."
+			exit 1;
+		fi
+	fi
+}
+
+main $*;
+

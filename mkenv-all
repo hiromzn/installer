@@ -1,0 +1,18 @@
+
+MYNAME="$0";
+MYARGS="$*";
+
+. ./common.env
+
+main()
+{
+	num=0;
+	for iname in $INSTANCE_LIST
+	do
+		./mkenv $iname $num
+		num="`expr $num + 1`";
+	done
+}
+
+main $*;
+

@@ -1,0 +1,28 @@
+#!/bin/bash
+JBOSS_HOME=__JBOSS_HOME__
+
+CONFIG=__JBOSS_CONFIG_NAME__
+SERVER_NAME="__JBOSS_SERVER_NAME__"
+BIND_ADDR="__JBOSS_BIND_ADDR__"
+MGMT_ADDR="__JBOSS_MGMT_ADDR__"
+UNSECURE_ADDR=
+PORT_OFFSET="__JBOSS_PORT_OFFSET__"
+RUN_CONF=${JBOSS_HOME}/${SERVER_NAME}/bin/standalone.conf
+
+WILDFLY_OPTS="-c $CONFIG"
+WILDFLY_OPTS="$WILDFLY_OPTS -Djboss.server.base.dir=${JBOSS_HOME}/${SERVER_NAME}"
+WILDFLY_OPTS="$WILDFLY_OPTS -Djboss.node.name=${SERVER_NAME}"
+WILDFLY_OPTS="$WILDFLY_OPTS -Djboss.bind.address=${BIND_ADDR}"
+if [ "x${MGMT_ADDR}" != "x" ]; then
+  WILDFLY_OPTS="$WILDFLY_OPTS -Djboss.bind.address.management=${MGMT_ADDR}"
+fi
+if [ "x${UNSECURE_ADDR}" != "x" ]; then
+  WILDFLY_OPTS="$WILDFLY_OPTS -Djboss.bind.address.unsecure=${UNSECURE_ADDR}"
+fi
+if [ "x${PORT_OFFSET}" != "x" ]; then
+  WILDFLY_OPTS="$WILDFLY_OPTS -Djboss.socket.binding.port-offset=${PORT_OFFSET}"
+fi
+
+export RUN_CONF
+$JBOSS_HOME/bin/standalone.sh $WILDFLY_OPTS
+

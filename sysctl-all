@@ -1,0 +1,54 @@
+
+MYNAME="$0";
+MYARGS="$*";
+
+. ./common.env
+. ./common.h
+
+main()
+{
+	cmd="$1";
+	kind="$2";
+
+	case "$cmd" in
+	setup ) setup ;;
+	clean ) clean ;;
+	start | stop | enable | disable | status ) cmd $cmd $kind ;;
+	* )
+		pr_error "bad command : $cmd";
+		exit 1;
+		;;
+	esac
+}
+
+setup()
+{
+	for envdir in $INSTANCE_DIR/*;
+	do
+		./sysctl setup httpd $envdir;
+		./sysctl setup jboss $envdir;
+	done
+}
+
+clean()
+{
+	for envdir in $INSTANCE_DIR/*;
+	do
+		./sysctl clean httpd $envdir;
+		./sysctl clean jboss $envdir;
+	done
+}
+
+cmd()
+{
+	cmd="$1";
+	kind="$2";
+
+	for envdir in $INSTANCE_DIR/*;
+	do
+		./sysctl $cmd $kind $envdir;
+	done
+}
+
+main $*;
+

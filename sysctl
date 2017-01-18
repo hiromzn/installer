@@ -1,0 +1,147 @@
+#
+# sysctl : systemd controle
+#
+# controle multiple systemctl instance
+#
+
+. ./common.env
+. ./common.h
+
+usage()
+{
+cat <<EOF
+controle multiple apache instance
+
+command name : $0
+
+usage : $0 <service_name> command....
+
+service_name :
+
+  service name of systemctl ( httpd / jboss )
+
+command :
+
+  setup:
+	setup
+	setup -f : force execute
+  check:
+	check
+  clean:
+	clean
+
+  do sysctrl command:
+  	<cmd> instance_name ( := `get_instance_name_list`)
+	<cmd> := start/stop/enable/disable/status
+
+  check all httpd process:
+	checkps
+EOF
+}
+
+#####################
+#
+# main
+#
+#####################
+main()
+{
+	cmd="$1";
+	kind="$2";
+	INST_DIR="$3";
+
+	PRODUCT=systemctl.$kind
+
+        . $INST_DIR/env/os.env
+        . $INST_DIR/env/$PRODUCT.env
+
+        confdir=$INST_DIR/conf/$PRODUCT
+
+	case "$cmd" in
+	setup )
+		log "creating $kind instance of systemctl : $confdir"
+		create_sysconfigfile $kind;
+		create_servicefile $kind;
+		message "systemctl daemon-reload"
+		systemctl daemon-reload;
+		;;
+
+	clean )
+		rmdir_force $SERVICE_FILE;
+		rmdir_force $SYSCONFIG_FILE;
+		;;
+
+	check )
+		ls -l $SYSCONFIG_FILE
+		ls -l $SERVICE_FILE
+		;;
+
+	start | stop | enable | disable | status )
+		do_cmd_instance $cmd
+		;;
+
+	checkps )
+		ps -ef |grep httpd
+		;;
+
+	-? | * )
+		usage;
+		exit 1;
+		;;
+	esac
+}
+##############################
+#
+# cofiguration
+#
+##############################
+
+#
+# service configration file
+#
+#  ex ) /etc/systemd/system/httpd.service
+#
+create_servicefile() # kind
+{
+	kind=$1;
+	sfile_base="$confdir/$kind.service";
+
+	if [ -s "$sfile_base" ]; then
+		cp $sfile_base $SERVICE_FILE;
+	else
+		pr_error "$sfile_base does NOT exists."
+		exit 1;
+	fi
+}
+
+#
+# environment configration file
+#
+#  ex ) /etc/sysconfig/httpd
+#
+create_sysconfigfile() # kind
+{
+	kind=$1;
+	sconfile=$SYSCONFIG_FILE
+	sconfile_base="$confdir/$kind";
+
+	if [ -s "$sconfile_base" ]; then
+		cp $sconfile_base $sconfile;
+	else
+		debug "DEBUG: skip to create $kind systemctl config file"
+	fi
+}
+
+do_cmd_instance() # cmd(start/stop/etc...)
+{
+	cmd="$1";
+
+	sname=$SERVICE_NAME
+
+	log "[sysctl] run systemctl $cmd $sname"
+	systemctl $cmd $sname
+}
+
+
+main $*;
+
