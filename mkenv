@@ -69,7 +69,6 @@ mk_os_env() # iname num
 		-e 's[__HEADER_DATE__['`date $DATE_TIME_FMT`'[g' \
 		-e 's[__OS_USER_NAME__['$uname'[g' \
 		-e 's[__OS_USER_ID__['${uid}'[g' \
-		-e 's[__OS_USER_PASSWORD__['${uname}pass'[g' \
 		-e 's[__OS_GROUP_NAME__['${iname}OG'[g' \
 		-e 's[__OS_GROUP_ID__['${gid}'[g' \
 		-e 's[__OS_USER_HOME__['$HOME_BASE_DIR/${iname}'[g' \
