@@ -42,7 +42,8 @@ main()
 
 	message "make config files for $envdir into $NEW_CONF";
 
-	os_envfile="$envdir/os.env";
+	. "$envdir/os.env"
+	. "$envdir/jboss.env"
 
 	for envname in $TGT_ENV
 	do
@@ -78,7 +79,6 @@ check_envdir() # envdir
 
 os_conf_filter() # void
 {
-	. $os_envfile;
         sed \
 		-e "s[__OS_USER_NAME__[$OS_USER_NAME[g" \
 		-e "s[__OS_USER_ID__[$OS_USER_ID[g" \
@@ -100,7 +100,10 @@ mk_conf_httpd() # envfile
 	do
 		fbase="`basename $f .BASE`";
 		newconf="$NEW_CONF/$kind/$fbase";
-		cat $f |httpd_conf_filter >$newconf;
+		cat $f \
+			|httpd_conf_filter \
+			|jboss_conf_filter \
+			>$newconf;
 	done
 }
 
