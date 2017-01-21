@@ -72,8 +72,7 @@ check_java()
 check_enforce()
 {
 	msg "message : check enforce"
-	getenforce |grep 'Permissive' >/dev/null
-	if [ "$?" -ne 0 ]
+	if [ "`getenforce`" != "Permissive" ];
 	then
 		now="`getenforce`";
 		pr_error "check SELinux mode in Permissive (now:$now)"

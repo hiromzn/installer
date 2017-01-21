@@ -89,7 +89,7 @@
 #host    replication     postgres        ::1/128                 md5
 
 ####################
-# for JAST
+# user defined
 ####################
 #
 #TYPE   DATABASE        USER            ADDRESS                 METHOD

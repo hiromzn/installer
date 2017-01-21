@@ -124,7 +124,7 @@ $ ./prepare clean
 		common.h ...... common fuctions
 
 		env.base/
-			httpd, jboss, systemctl[httpd/jboss]
+			os, httpd, jboss, systemctl[httpd/jboss]
 
 			## RULE ##
 				ENV_NAME=__ENV_NAME__ ... depend on instance.

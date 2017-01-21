@@ -198,7 +198,7 @@ setup_jboss_web_container()
 	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
 	su - $OS_USER_NAME -c "$jbosscli" <<EOF
 /subsystem=undertow/server=default-server/ajp-listener=default-ajp:add(socket-binding=ajp)
-/subsystem=undertow/server=default-server/ajp-listener=default-ajp:write-attribute(name=no-request-timeout,value=600000)
+/subsystem=undertow/server=default-server/ajp-listener=default-ajp:write-attribute(name=no-request-timeout,value=$JBOSS_NO_REQUEST_TIMEOUT)
 /subsystem=undertow/server=default-server/ajp-listener=default-ajp:write-attribute(name=tcp-keep-alive,value=true)
 EOF
 }
@@ -207,7 +207,7 @@ setup_jboss_io()
 {
 	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
 	su - $OS_USER_NAME -c "$jbosscli" <<EOF
-/subsystem=io/worker=default:write-attribute(name=task-max-threads,value=400)
+/subsystem=io/worker=default:write-attribute(name=task-max-threads,value=$JBOSS_TASK_MAX_THREADS)
 EOF
 }
 
@@ -236,15 +236,24 @@ add_jboss_user()
 
 	#OFF# $cmd -sc $conf -u $JBOSS_MONITOR_USER -p $JBOSS_USER_PASSWORD -g $JBOSS_MONITOR_GROUP
 	#OFF# $cmd -sc $conf -u $JBOSS_DEPLOYER_USER -p $JBOSS_USER_PASSWORD -g $JBOSS_DEPLOYER_GROUP
+	message "create JBoss user: name:$JBOSS_USER password:$JBOSS_USER_PASSWORD group:$JBOSS_GROUP"
 	$cmd -sc $conf -u $JBOSS_USER -p $JBOSS_USER_PASSWORD -g $JBOSS_GROUP
+	message "create JBoss admin: name:$JBOSS_ADMIN password:$JBOSS_ADMIN_PASSWORD group:$JBOSS_GROUP"
+	$cmd -sc $conf -u $JBOSS_ADMIN -p $JBOSS_ADMIN_PASSWORD -g $JBOSS_GROUP
 }
 
 setup_jdbc_driver()
 {
 	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
 	su - $OS_USER_NAME -c "$jbosscli" <<EOF
-module add --name=org.postgresql.jdbc --resources=$JBOSS_JDBC_DRIVER --dependencies=javax.api,javax.transaction.api
-/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql.jdbc,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)
+module add \
+  --name=org.postgresql.jdbc \
+  --resources=$JBOSS_JDBC_DRIVER \
+  --dependencies=javax.api,javax.transaction.api
+/subsystem=datasources/jdbc-driver=$JBOSS_JDBC_DRIVER_NAME:\
+  add(driver-name=$JBOSS_JDBC_DRIVER_NAME,\
+      driver-module-name=org.postgresql.jdbc,\
+      driver-xa-datasource-class-name=$JBOSS_JDBC_DRIVER_XA_DS_CLASS_NAME)
 EOF
 }
 
@@ -256,13 +265,21 @@ setup_data_source()
 	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
 	log "JBoss setup Data source for $JBOSS_DS_NAME"
 	su - $OS_USER_NAME -c "$jbosscli" <<EOF
-data-source add --name=$JBOSS_DS_NAME --driver-name=postgresql --connection-url=jdbc:postgresql://$JBOSS_DB_SERVER_NAME:$JBOSS_DB_SERVER_PORT/$JBOSS_DB_DB_NAME --jndi-name=java:jboss/datasources/$JBOSS_DS_NAME --user-name=$JBOSS_DB_USER_NAME --password=$JBOSS_DB_PASSWORD
-data-source --name=$JBOSS_DS_NAME --max-pool-size=20
-data-source --name=$JBOSS_DS_NAME --min-pool-size=5
-data-source --name=$JBOSS_DS_NAME --pool-prefill=true
-data-source --name=$JBOSS_DS_NAME --query-timeout=300
-data-source --name=$JBOSS_DS_NAME --valid-connection-checker-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker
-data-source --name=$JBOSS_DS_NAME --exception-sorter-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter
+data-source add \
+  --name=$JBOSS_DS_NAME \
+  --driver-name=$JBOSS_JDBC_DRIVER_NAME \
+  --connection-url=$JBOSS_DS_CONNECTION_URL \
+  --jndi-name=$JBOSS_DS_JNDI_NAME \
+  --user-name=$JBOSS_DB_USER_NAME \
+  --password=$JBOSS_DB_PASSWORD
+data-source --name=$JBOSS_DS_NAME --max-pool-size=$JBOSS_DS_MAX_POOL_SIZE
+data-source --name=$JBOSS_DS_NAME --min-pool-size=$JBOSS_DS_MIN_POOL_SIZE
+data-source --name=$JBOSS_DS_NAME --pool-prefill=$JBOSS_DS_POOL_PREFILL
+data-source --name=$JBOSS_DS_NAME --query-timeout=$JBOSS_DS_QUERY_TIMEOUT
+data-source --name=$JBOSS_DS_NAME \
+  --valid-connection-checker-class-name=$JBOSS_DS_VALID_CON_CHECKER_CLASS
+data-source --name=$JBOSS_DS_NAME \
+  --exception-sorter-class-name=$JBOSS_DS_EXCEPTION_SORTER_CLASS
 reload
 EOF
 }

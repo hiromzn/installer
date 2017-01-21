@@ -52,13 +52,13 @@ package()
 	(
 		cd ..;
 		if [ ! -d "$revdir" ]; then mkdir $revdir; fi;
-		arcfile="$revdir/$dirname-`hostname -s`-$dstr.tar";
+		arcfile="$revdir/$dirname-`hostname -s`-$dstr.tar.z";
 		echo "creating archive in $arcfile";
 		mkdir work@@dir
 		cp -r $dirname work@@dir
 		cd work@@dir
 		rm -rf $dirname/.git
-		tar cf $arcfile ./$dirname;
+		tar czf $arcfile ./$dirname;
 		cd ..;
 		rm -rf work@@dir;
 	)

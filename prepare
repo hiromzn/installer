@@ -97,7 +97,7 @@ mkpackage()
 	cp ./fwctl "$SCRIPT_DIR";
 	cp ./usergroupctl "$SCRIPT_DIR";
 	cp ./usergroupctl-all "$SCRIPT_DIR";
-	( cd "$SCRIPT_DIR"; ln -s ../output .; )
+	( cd "$SCRIPT_DIR"; if [ ! -L output ]; then ln -s ../output .; fi; )
 	
 	mydirname="`basename \`pwd\``";
 	log "TAR package for db/batch server setup (package:../$mydirname-package.tar := ($SCRIPT_DIR, $INSTANCE_DIR))"
