@@ -78,9 +78,9 @@ group_admin_user() # action gname
 
 del_group()
 {
+	group_admin_user "del" $OS_GROUP_NAME;
 	message "groupdel $OS_GROUP_NAME"
 	groupdel $OS_GROUP_NAME
-	group_admin_user "del" $OS_GROUP_NAME;
 }
 
 add_user()
