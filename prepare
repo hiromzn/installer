@@ -3,7 +3,7 @@ MYNAME="$0";
 MYARGS="$*";
 
 . ./common.env
-. ./common.h
+. ./utility.h
 
 usage()
 {
@@ -93,7 +93,7 @@ mkdbscript()
 
 mkpackage()
 {
-	cp ./common.h "$SCRIPT_DIR";
+	cp ./utility.h "$SCRIPT_DIR";
 	cp ./fwctl "$SCRIPT_DIR";
 	cp ./usergroupctl "$SCRIPT_DIR";
 	cp ./usergroupctl-all "$SCRIPT_DIR";

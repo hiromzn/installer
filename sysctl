@@ -5,7 +5,7 @@
 #
 
 . ./common.env
-. ./common.h
+. ./utility.h
 
 usage()
 {

@@ -1,5 +1,5 @@
 #
-# common.h : common functions
+# utility.h : common utility functions
 #
 ######################
 # log

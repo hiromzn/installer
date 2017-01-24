@@ -4,7 +4,7 @@
 # controle multiple apache instance
 #
 . ./common.env
-. ./common.h
+. ./utility.h
 
 HTTPD_ORG_TOPDIR=/etc/httpd
 HTTPD_ORG_MODULES_ABS_DIR=/usr/lib64/httpd/modules

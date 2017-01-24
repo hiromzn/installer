@@ -3,8 +3,7 @@ MYNAME="$0";
 MYARGS="$*";
 
 . ./common.env
-
-. ./common.h
+. ./utility.h
 
 usage()
 {

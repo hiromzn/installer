@@ -3,7 +3,7 @@
 #
 
 . ./common.env
-. ./common.h
+. ./utility.h
 
 main() # action envfile
 {

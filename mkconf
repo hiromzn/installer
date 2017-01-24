@@ -3,7 +3,7 @@ MYNAME="$0";
 MYARGS="$*";
 
 . ./common.env
-. ./common.h
+. ./utility.h
 
 BASE_CONF="./conf.base";
 

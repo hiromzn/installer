@@ -3,7 +3,7 @@ MYNAME="$0";
 MYARGS="$*";
 
 . ./common.env
-. ./common.h
+. ./utility.h
 
 FW_CMD="firewall-cmd";
 FW_CMD_OPT="--zone=public";

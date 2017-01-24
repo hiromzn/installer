@@ -121,7 +121,7 @@ $ ./prepare clean
 
    TOOL_HOME/
 		common.env .... common environment value
-		common.h ...... common fuctions
+		utility.h ...... utility fuctions
 
 		env.base/
 			os, httpd, jboss, systemctl[httpd/jboss]
