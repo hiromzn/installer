@@ -14,7 +14,7 @@ usage()
 cat <<EOF
 controle multiple jboss instance
 
-usage : $0 command <INSTANCE_DIR>
+usage : $0 command <instance_directory>
 
 command : 
   setup

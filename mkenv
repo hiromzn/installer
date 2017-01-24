@@ -25,7 +25,7 @@ main()
 	iname=$1;
 	num=$2;
 
-	NEW_ENV="$INSTANCE_DIR/$iname/env";
+	NEW_ENV="$REPO_DIR/$iname/env";
 
 	mkdir -p "$NEW_ENV";
 

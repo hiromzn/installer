@@ -28,12 +28,12 @@ how to RUN
 $ hostanme
 <WEB_AP_server>
 
-// make all environment files into output/<instance_name>/env directory.
-// make all config files into output/<instance_name>/conf directory.
+// make all environment files into $REPO_DIR/<instance_name>/env directory.
+// make all config files into $REPO_DIR/<instance_name>/conf directory.
 // make all script for setup
 // create tar package for DB and BATCH server setup
 
-$ ./prepare all
+$ ./mkrepo all
 
 // copy tar package to DB and BATCH server.
 $ scp ../installer-package.tar <DB_SERVER>:
@@ -113,7 +113,7 @@ $ sudo ./mkall stop
 $ sudo ./mkall clean
 
 // cleanup environment / config / script directory.
-$ ./prepare clean
+$ ./mkrepo clean
 
 --------------------------------
  directory structure & scripts
@@ -138,7 +138,7 @@ $ ./prepare clean
 	## RULE ##
 		replace __ENV_NAME__ --> value_of_each_instance
 
-   	./$INSTANCE_DIR/
+   	./$REPO_DIR/
 	    <INST_NAME>/
 		env/
 			os, httpd, jboss, systemctl[httpd/jboss]

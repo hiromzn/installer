@@ -23,7 +23,7 @@ main()
 
 setup()
 {
-	for envdir in $INSTANCE_DIR/*;
+	for envdir in $REPO_DIR/*;
 	do
 		./jbossctl setup $envdir;
 	done
@@ -31,7 +31,7 @@ setup()
 
 clean()
 {
-	for envdir in $INSTANCE_DIR/*;
+	for envdir in $REPO_DIR/*;
 	do
 		./jbossctl clean $envdir;
 	done
@@ -41,7 +41,7 @@ cmd()
 {
 	cmd="$1";
 
-	for envdir in $INSTANCE_DIR/*;
+	for envdir in $REPO_DIR/*;
 	do
 		./jbossctl $cmd $envdir;
 	done

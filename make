@@ -36,7 +36,7 @@ main()
 
 ci()
 {
-	rm -rf "${INSTANCE_DIR}";
+	rm -rf "${REPO_DIR}";
 	rm -rf "${SCRIPT_DIR}";
 	git add -A
 	git commit
@@ -65,34 +65,35 @@ package()
 
 check()
 {
+ok_repo=repo.ok
 (
 	set +e;
-	cd $INSTANCE_DIR;
+	cd $REPO_DIR;
 	find */conf -type f |while read f;
 	do
 		echo "###### $f"
-		diff $f ../output.OK/$f >/dev/null 2>&1
+		diff $f ../$ok_repo/$f >/dev/null 2>&1
 		if [ "$?" -ne 0 ];
 		then
-			echo "##### diff env : $f ../output.OK/$f"
-			diff $f ../output.OK/$f
+			echo "##### diff env : $f ../$ok_repo/$f"
+			diff $f ../$ok_repo/$f
 		fi
 	done
 )
 (
 	set +e;
-	cd $INSTANCE_DIR;
+	cd $REPO_DIR;
 	for ienv in */env;
 	do
 	find $ienv -type f |while read f;
 	do
 		echo "###### $f"
 		( . $ienv/os.env; . $ienv/jboss.env; . $f; env >/tmp/new; )
-		( . ../output.OK/$f; env >/tmp/ok; )
+		( . ../$ok_repo/$f; env >/tmp/ok; )
 		diff /tmp/new /tmp/ok >/dev/null 2>&1
 		if [ "$?" -ne 0 ];
 		then
-			echo "##### diff env : $f ../output.OK/$f"
+			echo "##### diff env : $f ../$ok_repo/$f"
 			diff /tmp/new /tmp/ok
 		fi
 	done

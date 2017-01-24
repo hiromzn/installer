@@ -33,7 +33,7 @@ main()
 
 add_all()
 {
-	for instdir in $INSTANCE_DIR/*;
+	for instdir in $REPO_DIR/*;
 	do
 		./usergroupctl addgroup $instdir
 		./usergroupctl adduser $instdir
@@ -42,7 +42,7 @@ add_all()
 
 add_all_group_to_admin()
 {
-	for instdir in $INSTANCE_DIR/*;
+	for instdir in $REPO_DIR/*;
 	do
 		./usergroupctl addgroupadmin $instdir
 	done
@@ -50,7 +50,7 @@ add_all_group_to_admin()
 
 del_all_group_to_admin()
 {
-	for instdir in $INSTANCE_DIR/*;
+	for instdir in $REPO_DIR/*;
 	do
 		./usergroupctl delgroupadmin $instdir
 	done
@@ -58,7 +58,7 @@ del_all_group_to_admin()
 
 del_all()
 {
-	for instdir in $INSTANCE_DIR/*;
+	for instdir in $REPO_DIR/*;
 	do
 		echo $instdir
 		./usergroupctl deluser $instdir

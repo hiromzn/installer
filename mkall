@@ -133,7 +133,7 @@ cmd()
 	cmd="$1";
 	kind="$2";
 
-	for envdir in $INSTANCE_DIR/*;
+	for envdir in $REPO_DIR/*;
 	do
 		log "message : $cmd $envdir";
 	done
@@ -143,18 +143,18 @@ check_env()
 {
 	check_install_httpd;
 	check_archive_files;
-	check_output_dir;
+	check_repo_dir;
 	check_java;
 	check_enforce;
 	check_run_user "root";
 }
 
-check_output_dir()
+check_repo_dir()
 {
-	if [ ! -d "$INSTANCE_DIR" ]
+	if [ ! -d "$REPO_DIR" ]
 	then
-		pr_error "INSTANCE_DIR(=$INSTANCE_DIR) environment is invalid !";
-		prstderr "       check common.env file or INSTANCE_DIR env value.";
+		pr_error "REPO_DIR(=$REPO_DIR) environment is invalid !";
+		prstderr "       check common.env file or REPO_DIR env value.";
 		exit 1;
 	fi
 }

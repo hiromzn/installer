@@ -9,7 +9,7 @@ set -eu
 main()
 {
 	num=0;
-	for envdir in $INSTANCE_DIR/*/env;
+	for envdir in $REPO_DIR/*/env;
 	do
 		./mkconf $envdir;
 		num="`expr $num + 1`";

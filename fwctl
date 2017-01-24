@@ -79,7 +79,7 @@ make_firewall_script() # kind
 {
 	kind="$1";
 	list="";
-	for d in $INSTANCE_DIR/*;
+	for d in $REPO_DIR/*;
 	do
 		list="$list $kind-`basename $d`";
 		if [ "$kind" = "http" ]; then
