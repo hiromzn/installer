@@ -5,6 +5,27 @@ MYARGS="$*";
 . ./common.env
 . ./utility.h
 
+usage()
+{
+cat <<EOF
+usage : $MYNAME command
+
+command:
+	setup
+	clean
+
+	setupadmin
+	cleanadmin
+
+	addalluser
+	delalluser
+
+	addallgroup
+	delallgroup
+
+	check
+EOF
+}
 main()
 {
 	action="$1";
@@ -12,8 +33,12 @@ main()
 	mkdir -p $HOME_BASE_DIR;
 
 	case "$action" in
+
 	setup ) add_all ;;
 	clean ) del_all ;;
+
+	addalluser | addallgroup | delalluser | delallgroup )
+		$action ;;
 
 	setupadmin ) add_all_group_to_admin ;;
 	cleanadmin ) del_all_group_to_admin ;;
@@ -26,6 +51,7 @@ main()
 		;;
 	* )
 		pr_error "can't find command $action";
+		usage;
 		exit 1;
 		;;
 	esac
@@ -35,8 +61,51 @@ add_all()
 {
 	for instdir in $REPO_DIR/*;
 	do
+		message "add user/group for $instdir"
 		./usergroupctl addgroup $instdir
 		./usergroupctl adduser $instdir
+	done
+}
+
+addalluser()
+{
+	for instdir in $REPO_DIR/*;
+	do
+		./usergroupctl adduser $instdir
+	done
+}
+
+addallgroup()
+{
+	for instdir in $REPO_DIR/*;
+	do
+		./usergroupctl addgroup $instdir
+	done
+}
+
+del_all()
+{
+	for instdir in $REPO_DIR/*;
+	do
+		message "delete user/group for $instdir"
+		./usergroupctl deluser $instdir
+		./usergroupctl delgroup $instdir
+	done
+}
+
+delalluser()
+{
+	for instdir in $REPO_DIR/*;
+	do
+		./usergroupctl deluser $instdir
+	done
+}
+
+delallgroup()
+{
+	for instdir in $REPO_DIR/*;
+	do
+		./usergroupctl delgroup $instdir
 	done
 }
 
@@ -53,16 +122,6 @@ del_all_group_to_admin()
 	for instdir in $REPO_DIR/*;
 	do
 		./usergroupctl delgroupadmin $instdir
-	done
-}
-
-del_all()
-{
-	for instdir in $REPO_DIR/*;
-	do
-		echo $instdir
-		./usergroupctl deluser $instdir
-		./usergroupctl delgroup $instdir
 	done
 }
 

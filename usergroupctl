@@ -13,7 +13,10 @@ main() # action envfile
 	envfile="$instdir/env/os.env";
 
 	if [ ! -s "$envfile" ]; then
-		pr_error "check $envfile !!!!"
+		pr_error "invalid envfile ($envfile)"
+		pr_error "check instance directory or envfile"
+		pr_error "instance directory is : $instdir";
+		usage;
 		exit 1;
 	fi
 
