@@ -1,3 +1,6 @@
+#
+# mkrepo : リポジトリ作成スクリプト
+#
 
 MYNAME="$0";
 MYARGS="$*";
@@ -12,7 +15,7 @@ usage : $MYNAME command
 
 command :
 	all ........... make all repository data.
-			(archive, env, conf)
+			(以下のarchive, env, confを実行)
 
 	archive ....... setup archive directory
 	env ........... make env files for all instance.
