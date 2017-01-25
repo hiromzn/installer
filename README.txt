@@ -6,9 +6,18 @@ $ tar xf <this_tool_package>.tar
 $ cd installer
 
 $ vi common.env
+
+
 ARCHIVE_DIR=${ARCHIVE_DIR:="<your_archive_dirctory_path>"}
+
+OS_USER_PASSWORD_DEF=${OS_USER_PASSWORD_DEF:="ospass"}
+JBOSS_USER_PASSWORD_DEF=${JBOSS_USER_PASSWORD_DEF:="jbosspass"}
+JBOSS_ADMIN_DEF=${JBOSS_ADMIN_DEF:="jbossadmin"}
+JBOSS_ADMIN_PASSWORD_DEF=${JBOSS_ADMIN_PASSWORD_DEF:="adminpass"}
+
+
 PG_SERVER_NAME=<DB_server_host_name>
-PG_DB_USER_PASSWORD=<PostgreSQL_db_user_password>
+PG_DB_USER_PASSWORD_DEF=${PG_DB_USER_PASSWORD_DEF:="password"}
 
 $ ./mkall archive
 
