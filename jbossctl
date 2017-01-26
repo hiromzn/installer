@@ -17,13 +17,20 @@ controle multiple jboss instance
 usage : $0 command <instance_directory>
 
 command : 
-  setup
-  clean
-  check
-  start
-  stop
-  checkps
-  checkds
+	setup ......... setup all config.
+	clean ......... clean all config.
+
+	wait .......... Wait for the process to start.
+	fwsetup ....... setup firewall configuration file.
+	fwclean ....... delete firewall configuration file.
+	addconfig ..... add configuration using jboss-cli tools.
+	adduser ....... add jboss admin user.
+	deploy ........ deploy test application.
+	check
+	checkps ....... check jboss process.
+	checkds ....... check datasource connection.
+
+firewall configuration file is : $FIREWALL_CONF_DIR/$JBOSS_FW_CONF_JBOSS_NAME.xml
 EOF
 }
 #####################
@@ -39,7 +46,17 @@ main()
         INST_DIR="$2";
         PRODUCT="jboss";
 
-	. $INST_DIR/env/os.env
+        envfile="$INST_DIR/env/os.env";
+
+        if [ ! -s "$envfile" ]; then
+                pr_error "invalid envfile ($envfile)"
+                pr_error "check instance directory or envfile"
+                pr_error "instance directory is : $INST_DIR";
+                usage;
+                exit 1;
+        fi
+
+	. $envfile
 	. $INST_DIR/env/$PRODUCT.env
 	
 	JBOSS_TESTAP="$WORK_DIR/$JBOSS_TESTAP_FNAME";

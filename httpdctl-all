@@ -10,28 +10,29 @@ main()
 	cmd="$1";
 
 	case "$cmd" in
-	setup ) setup ;;
-	clean ) clean ;;
-	start | stop | enable | disable | status ) cmd $cmd ;;
+	setup | clean | fwsetup | fwclean | checkps ) cmd $cmd ;;
+	* )
+		usage;
+		exit 1;
+		;;
 	esac
 }
 
-setup()
+usage()
 {
-	for envdir in $REPO_DIR/*;
-	do
-		./httpdctl setup $envdir;
-	done
-}
+cat <<EOF
 
-clean()
-{
-	for envdir in $REPO_DIR/*;
-	do
-		./httpdctl clean $envdir;
-	done
-}
+usage : $MYNAME <command>
 
+command :
+	setup
+	clean
+	fwsetup
+	fwclean
+	checkps
+
+EOF
+}
 cmd()
 {
 	cmd="$1";

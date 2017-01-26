@@ -12,25 +12,21 @@ HTTPD_ORG_MODULES_ABS_DIR=/usr/lib64/httpd/modules
 usage()
 {
 cat <<EOF
-controle multiple apache HTTPD instance
 
 usage : $0 command <instance_definition_top_dir>
+
+command :
+        setup ......... setup all config.
+        clean ......... clean all config.
+
+        fwsetup ....... setup firewall configuration file.
+        fwclean ....... delete firewall configuration file.
+        check ......... check all configuration.
+        checkps ....... check all httpd process.
 
 <instance_definition_top_dir> has:
 	./env  ...... environment variable file
 	./conf ...... config file
-
-command :
-  setup [-f]
-	setup all config.
-	( -f : force execute )
-  check:
-	check all configuration
-  clean:
-	clean all cofiguration
-
-  checkps
-  	check all httpd process:
 EOF
 }
 
@@ -45,7 +41,17 @@ main()
 	INST_DIR="$2";
 	PRODUCT="httpd";
 
-	. $INST_DIR/env/os.env
+        envfile="$INST_DIR/env/os.env";
+
+        if [ ! -s "$envfile" ]; then
+                pr_error "invalid envfile ($envfile)"
+                pr_error "check instance directory or envfile"
+                pr_error "instance directory is : $INST_DIR";
+                usage;
+                exit 1;
+        fi
+
+        . $envfile
 	. $INST_DIR/env/$PRODUCT.env
 
 	case "$cmd" in
