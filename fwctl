@@ -8,10 +8,35 @@ MYARGS="$*";
 FW_CMD="firewall-cmd";
 FW_CMD_OPT="--zone=public";
 
+usage()
+{
+cat <<EOF
+
+usage: $0 command [service_name]
+
+command:
+	add <service_name>
+	remove <service_name>
+
+	mkscript .... create firewall scripts into $FW_SCRIPT_DIR
+
+			fw.{http | jboss}-all.{add | remove}.sh
+			fw.{ap | db | common}.{add | remove}.sh
+			
+	reload ...... reload service
+
+	lists ....... list services
+	listp ....... list ports
+	listdir ..... list firewall service directory.
+EOF
+}
+
 main()
 {
 	cmd="$1";
-	case "$1" in
+	service="$2";
+
+	case "$cmd" in
 
 	mkscript ) mkscript ;;
 	clean ) clean ;;
@@ -29,26 +54,16 @@ main()
 		ls -l /etc/firewalld/services/
 		;;
 	add | remove )
-		echo "firewall command:$cmd service:$2";
-		firewall-cmd --$cmd-service=$2 $FIREWALL_CMD_OPT
-		firewall-cmd --$cmd-service=$2 $FIREWALL_CMD_OPT --permanent
+		echo "firewall command:$cmd service:$service";
+		firewall-cmd --$cmd-service=$service $FIREWALL_CMD_OPT
+		firewall-cmd --$cmd-service=$service $FIREWALL_CMD_OPT --permanent
 		firewall-cmd --list-services $FIREWALL_CMD_OPT
 		firewall-cmd --list-ports $FIREWALL_CMD_OPT
 		;;
 	* )
-		cat <<EOF
-usage: $0 command
-
-command:
-	add <service_name>
-	remove <service_name>
-
-	reload
-
-	lists .... list services
-	listp .... list ports
-	listdir
-EOF
+		pr_error "bad commnad : $cmd";
+		usage;
+		exit 1;
 		;;
 	esac
 }
@@ -67,7 +82,7 @@ clean()
 	rm -rf $FW_SCRIPT_DIR;
 }
 
-make_script() # server_kind confname_list.....
+make_script() # server_kind service_list...
 {
         log "creating firewall config script for $1 server into $FW_SCRIPT_DIR";
         mkdir -p "$FW_SCRIPT_DIR";
@@ -92,7 +107,7 @@ make_firewall_script() # kind
 	create_firewall_conf_script "remove" $kind-all $list;
 }
 
-create_firewall_conf_script() # cmd confname
+create_firewall_conf_script() # cmd server_kind service_list...
 {
 	cmd="$1";
 	skind="$2";
