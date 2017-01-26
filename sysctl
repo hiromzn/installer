@@ -10,32 +10,27 @@
 usage()
 {
 cat <<EOF
-controle multiple apache instance
+usage : $0 command service <instance_directory>
 
-command name : $0
-
-usage : $0 <service_name> command....
-
-service_name :
+service :
 
   service name of systemctl ( httpd / jboss )
 
 command :
+  	setup 	..... setup service
+  	clean	..... cleanup service definition
 
-  setup:
-	setup
-	setup -f : force execute
-  check:
-	check
-  clean:
-	clean
+  	check
 
-  do sysctrl command:
-  	<cmd> instance_name ( := `get_instance_name_list`)
-	<cmd> := start/stop/enable/disable/status
+  	start | stop | enable | disable | status
+  		you can user these systemctl commands.
 
-  check all httpd process:
-	checkps
+	checkps	..... check all httpd or jboss process:
+
+instance_directory :
+	directory for instance repository
+	ex:) $REPO_DIR/<instance_name>
+  	ex:) instance_name ( := $INSTANCE_LIST )
 EOF
 }
 
@@ -52,7 +47,17 @@ main()
 
 	PRODUCT=systemctl.$kind
 
-        . $INST_DIR/env/os.env
+        envfile="$INST_DIR/env/os.env";
+
+        if [ ! -s "$envfile" ]; then
+                pr_error "invalid envfile ($envfile)"
+                pr_error "check instance directory or envfile"
+                pr_error "instance directory is : $INST_DIR";
+                usage;
+                exit 1;
+        fi
+
+        . $envfile
         . $INST_DIR/env/$PRODUCT.env
 
         confdir=$INST_DIR/conf/$PRODUCT
@@ -81,7 +86,8 @@ main()
 		;;
 
 	checkps )
-		ps -ef |grep httpd
+		message "check $kind process"
+		ps -ef |grep $kind
 		;;
 
 	-? | * )
@@ -90,6 +96,7 @@ main()
 		;;
 	esac
 }
+
 ##############################
 #
 # cofiguration

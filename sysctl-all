@@ -5,17 +5,47 @@ MYARGS="$*";
 . ./common.env
 . ./utility.h
 
+usage()
+{
+cat <<EOF
+
+usage : $MYNAME command service
+
+command : this script do command for all instance in $REPO_DIR.
+
+	setup
+	clean
+
+	start | stop | enable | disable | status
+
+service :
+	httpd or jboss
+
+EOF
+}
+
 main()
 {
 	cmd="$1";
 	kind="$2";
 
+	case "$kind" in
+	httpd | jboss ) ;;
+	* )
+		pr_error "bad service name : $kind";
+		pr_error "service name is : httpd or jboss !!!!"
+		usage;
+		exit 1;
+		;;
+	esac
+		
 	case "$cmd" in
 	setup ) setup ;;
 	clean ) clean ;;
 	start | stop | enable | disable | status ) cmd $cmd $kind ;;
 	* )
 		pr_error "bad command : $cmd";
+		usage;
 		exit 1;
 		;;
 	esac
