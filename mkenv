@@ -104,8 +104,6 @@ mk_jboss_env() # iname num
 
 	. $NEW_ENV/os.env
 
-	#OFF# jhome="$OS_USER_HOME/opt/\$JBOSS_HOME_NAME";
-	#OFF# sname="${iname}A";
 	javahome="`get_java_home`";
 
 	poffset="`expr $JOBSS_PORT_OFFSET + $JBOSS_PORT_OFFSET_BASE_OFFSET \* \( $num + 1 \)`";
