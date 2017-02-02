@@ -97,6 +97,18 @@ $ cd installer
 $ tar xf $HOME/installer-package.tar
 $ sudo ./script/fw/fw.common.add.sh
 
+------------------------------------------------------
+Appendix: postgreSQL : psql command without password
+------------------------------------------------------
+$ id
+postgres
+$ cd $HOME
+$ vi $HOME/.pgpass
+localhost:5432:*:postgres:<password>
+$ chmod 600 $HOME/.pgpass
+$ ll /home/postgres/.pgpass 
+-rw-------. 1 postgres postgres 35  1月 14 12:10 /home/postgres/.pgpass
+
 -------------------------------------------------
 clean firewall config (close port for services)
 -------------------------------------------------
