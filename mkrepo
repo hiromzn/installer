@@ -92,6 +92,8 @@ mkdbscript()
 	mkdir -p "$DB_SCRIPT_DIR";
 	cp ./dbtools/* "$DB_SCRIPT_DIR";
 	cp ./common.env "$DB_SCRIPT_DIR/..";
+	if [ -s "../common_static.env" ]; then cp ../common_static.env "$DB_SCRIPT_DIR/.."; fi
+	if [ -s "./common_static.env" ]; then cp ./common_static.env "$DB_SCRIPT_DIR"; fi
 }
 
 mkpackage()
