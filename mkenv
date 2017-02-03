@@ -33,7 +33,7 @@ main()
 
 	check_java;
 
-	for envname in os httpd jboss systemctl.jboss systemctl.httpd
+	for envname in $ENV_LIST;
 	do
 		bfile="$BASE_ENV/$envname.env.BASE";
 		if [ -s "$bfile" ]

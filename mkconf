@@ -7,14 +7,6 @@ MYARGS="$*";
 
 BASE_CONF="./conf.base";
 
-TGT_ENV="
-	os
-	httpd
-	jboss
-	systemctl.httpd
-	systemctl.jboss
-";
-	
 usage()
 {
 cat <<EOF
@@ -45,17 +37,17 @@ main()
 	. "$envdir/os.env"
 	. "$envdir/jboss.env"
 
-	for envname in $TGT_ENV
+	for envname in $ENV_LIST
 	do
 		envfile="$envdir/$envname.env";
 		if [ -s "$envfile" ];
 		then
 			case "$envname" in
 			os ) os_flag=1; ;;
-			httpd ) mk_conf_httpd $envfile ;;
-			jboss ) mk_conf_jboss $envfile ;;
-			systemctl.httpd ) mk_conf_systemctl_httpd $envfile ;;
-			systemctl.jboss ) mk_conf_systemctl_jboss $envfile ;;
+			httpd ) mk_conf_httpd $envfile $envname ;;
+			jboss ) mk_conf_jboss $envfile $envname ;;
+			systemctl.httpd ) mk_conf_systemctl_httpd $envfile $envname ;;
+			systemctl.jboss ) mk_conf_systemctl_jboss $envfile $envname ;;
 			esac
 		fi
 	done
@@ -65,7 +57,7 @@ check_envdir() # envdir
 {
 	envdir="$1";
 	flag=0;
-	for f in $TGT_ENV
+	for f in $ENV_LIST
 	do
 		envfile="$envdir/$f.env";
 		if [ -s "$envfile" ]; then
@@ -73,7 +65,7 @@ check_envdir() # envdir
 		fi
 	done
 	if [ "$flag" -eq 0 ]; then
-		pr_error "$envdir does NOT have ($TGT_ENV).env"
+		pr_error "$envdir does NOT have ($ENV_LIST).env"
 	fi
 }
 
@@ -88,12 +80,12 @@ os_conf_filter() # void
 		;
 }
 
-mk_conf_httpd() # envfile
+mk_conf_httpd() # envfile envname
 {
 	envfile="$1";
-	. $envfile
+	kind="$2";
 
-	kind="httpd";
+	. $envfile
 
 	mkdir -p "$NEW_CONF/$kind";
 	for f in $BASE_CONF/$kind/*.BASE
@@ -129,12 +121,12 @@ httpd_conf_filter() # void
                 ;
 }
 
-mk_conf_jboss() # envfile
+mk_conf_jboss() # envfile envname
 {
 	envfile="$1";
-	. $envfile
+	kind="$2";
 
-	kind="jboss";
+	. $envfile
 
 	mkdir -p "$NEW_CONF/$kind";
 	for f in $BASE_CONF/$kind/*.BASE
@@ -175,12 +167,12 @@ jboss_conf_filter() # void
 
 }
 
-mk_conf_systemctl_jboss() # envfile
+mk_conf_systemctl_jboss() # envfile envname
 {
 	envfile="$1";
-	. $envfile
+	kind="$2";
 
-	kind="systemctl.jboss";
+	. $envfile
 
 	mkdir -p "$NEW_CONF/$kind";
 	for f in $BASE_CONF/$kind/*.BASE
@@ -194,12 +186,12 @@ mk_conf_systemctl_jboss() # envfile
 	done
 }
 
-mk_conf_systemctl_httpd() # envfile
+mk_conf_systemctl_httpd() # envfile envname
 {
 	envfile="$1";
-	. $envfile
+	kind="$2";
 
-	kind="systemctl.httpd";
+	. $envfile
 
 	mkdir -p "$NEW_CONF/$kind";
 	for f in $BASE_CONF/$kind/*.BASE

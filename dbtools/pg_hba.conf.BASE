@@ -96,17 +96,11 @@
 
 local   all             postgres                                md5
 
-host    LXaD            LXaDU           0.0.0.0/0               md5
-host    LEaD            LEaDU           0.0.0.0/0               md5
-host    LJaD            LJaDU           0.0.0.0/0               md5
-host    LVaD            LVaDU           0.0.0.0/0               md5
-host    SDaD            SDaDU           0.0.0.0/0               md5
-host    BPaD            BPaDU           0.0.0.0/0               md5
-host    LXbD            LXbDU           0.0.0.0/0               md5
-host    LEbD            LEbDU           0.0.0.0/0               md5
-host    LJbD            LJbDU           0.0.0.0/0               md5
-host    LVbD            LVbDU           0.0.0.0/0               md5
-host    SDbD            SDbDU           0.0.0.0/0               md5
-host    BPbD            BPbDU           0.0.0.0/0               md5
-host    MGxD            MGxDU           0.0.0.0/0               md5
+host    LXD             LXDU            0.0.0.0/0               md5
+host    LED             LEDU            0.0.0.0/0               md5
+host    LJD             LJDU            0.0.0.0/0               md5
+host    LVD             LVDU            0.0.0.0/0               md5
+host    SDD             SDDU            0.0.0.0/0               md5
+host    BPD             BPDU            0.0.0.0/0               md5
+host    MGD             MGDU            0.0.0.0/0               md5
 
