@@ -83,7 +83,7 @@ main()
 		;;
 
 	clean )
-		echo "CLEANING: instance $JBOSS_SERVER_NAME"
+		message "CLEANING: JBoss instance $JBOSS_SERVER_NAME"
 		clean_jboss;
 		;;
 
@@ -156,7 +156,9 @@ create_jboss_inst() # confdir
 
 clean_jboss()
 {
-	echo "removing jboss : $JBOSS_HOME ..."
+	message "removing firewall config file"
+	fwclean;
+	message "removing jboss : $JBOSS_HOME ..."
 	rm -rf $JBOSS_HOME
 }
 

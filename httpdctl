@@ -77,7 +77,7 @@ main()
 		done
 		;;
 	clean )
-		rmdir_force $HTTPD_TOPDIR;
+		clean_all;
 		;;
 
 	checkps )
@@ -89,6 +89,13 @@ main()
 		exit 1;
 		;;
 	esac
+}
+
+clean_all()
+{
+	message "CLEANING: httpd instance $INST_DIR"
+	fwclean;
+	rmdir_force $HTTPD_TOPDIR;
 }
 
 get_apache_version()
