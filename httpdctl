@@ -145,7 +145,10 @@ fwsetup() # instdir
 	confdir=$instdir/conf/$PRODUCT
 
 	cp $confdir/http.xml $FIREWALL_CONF_DIR/$HTTPD_FW_CONF_HTTP_NAME.xml
-	#OFF# cp $confdir/https.xml $FIREWALL_CONF_DIR/$HTTPD_FW_CONF_HTTPS_NAME.xml
+	#
+	# commnet out if you use SSL/TLS
+	#
+	# cp $confdir/https.xml $FIREWALL_CONF_DIR/$HTTPD_FW_CONF_HTTPS_NAME.xml
 }
 
 fwclean()

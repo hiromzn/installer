@@ -92,6 +92,7 @@ setup()
 	./usergroupctl-all setup
 	./httpdctl-all setup
 	./jbossctl-all setup
+	./fwctl-all setup
 	./sysctl-all setup httpd
 	./sysctl-all setup jboss
 	./sysctl-all enable httpd
@@ -123,6 +124,7 @@ clean()
 	./sysctl-all disable jboss
 	./sysctl-all clean httpd
 	./sysctl-all clean jboss
+	./fwctl-all clean
 	./httpdctl-all clean
 	./jbossctl-all clean
 	./usergroupctl-all clean

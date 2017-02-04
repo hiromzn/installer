@@ -1,0 +1,59 @@
+
+MYNAME="$0";
+MYARGS="$*";
+
+. ./common.env
+. ./utility.h
+
+usage()
+{
+cat <<EOF
+usage : $MYNAME command
+
+command :
+	setup
+	clean
+
+EOF
+}
+
+main()
+{
+	cmd="$1";
+
+	case "$cmd" in
+	setup ) setup ;;
+	clean ) clean ;;
+
+	* ) 
+		pr_error "bad command : $cmd : $MYNAME";
+		usage;
+		exit 1;
+		;;
+	esac
+}
+
+setup()
+{
+	./fwctl reload
+	for envdir in $REPO_DIR/*;
+	do
+		instname="`basename $envdir`";
+		./fwctl add http-$instname
+		./fwctl add jboss-$instname
+	done
+}
+
+clean()
+{
+	./fwctl reload
+	for envdir in $REPO_DIR/*;
+	do
+		instname="`basename $envdir`";
+		./fwctl remove http-$instname
+		./fwctl remove jboss-$instname
+	done
+}
+
+main $*;
+
