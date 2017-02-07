@@ -1,3 +1,6 @@
+#
+# fwctl : firewall control
+#
 
 MYNAME="$0";
 MYARGS="$*";
@@ -22,7 +25,7 @@ command:
 
 			fw.{http | jboss}-all.{add | remove}.sh
 			fw.{ap | db | common}.{add | remove}.sh
-			
+
 	reload ...... reload service
 
 	list ........ list all
@@ -142,4 +145,3 @@ check_conf_file() # confname
 }
 
 main $*;
-
