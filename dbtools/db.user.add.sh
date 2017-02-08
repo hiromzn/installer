@@ -1,7 +1,6 @@
-. ../common.env
-
-for i in $DB_INSTANCE_LIST
+for d in `ls -d ../repo/*`
 do
+i="`basename $d`"
 u="${i}DU"
 
 cat <<EOF
