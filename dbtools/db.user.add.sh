@@ -1,3 +1,5 @@
+. ../common.env
+
 for d in `ls -d ../repo/*`
 do
 i="`basename $d`"
