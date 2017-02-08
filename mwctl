@@ -1,0 +1,80 @@
+
+MYNAME="$0";
+MYARGS="$*";
+
+ID_LIST="LX LE LJ LV BP MH LI" 
+
+command="/usr/bin/systemctl";
+
+set -ea;
+
+id -a
+
+usage()
+{
+cat <<EOF 1>&2
+
+usage : $MYNAME command mw_kind
+
+command :
+	start
+	stop
+	restart
+	status
+
+mw_kind :
+	httpd
+	jboss
+
+description:
+	target service : {httpd|jboss}-$ID.service
+	ID is := $ID_LIST;
+EOF
+}
+
+main()
+{
+	if [ "$#" -lt 2 ]; then
+		usage;
+		exit 1;
+	fi
+
+	cmd="$1";
+	mw="$2";
+
+	id=`check_user`;
+
+	service="$mw-$id"
+
+	case "$cmd" in
+	start | stop | restart )
+		$command $cmd $service;
+		;;
+	status )
+		$command $cmd -l $service;
+		;;
+	* )
+		usage;
+		exit 1;
+		;;
+	esac
+}
+
+check_user()
+{
+	x="`id -un |sed 's/OU$//'`";
+	for i in $ID_LIST;
+	do
+		if [ "$i" = "$x" ]; then
+			echo "$i";
+			return;
+		fi
+	done
+	echo "ERROR: You are not authorized to execute this command." 1>&2
+	echo "ERROR: Your id is `id -un`." 1>&2
+	usage;
+	exit 1;
+}
+
+main $*;
+
