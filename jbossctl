@@ -14,7 +14,7 @@ usage()
 cat <<EOF
 controle multiple jboss instance
 
-usage : $0 command <instance_directory>
+usage : $0 command <instance_directory> [value]
 
 command : 
 	setup ......... setup all config.
@@ -30,6 +30,9 @@ command :
 	checkps ....... check jboss process.
 	checkds ....... check datasource connection.
 
+	setsessonto ... set session timeout with value (unit: minuts)
+	getsessonto ... get session timeout
+
 firewall configuration file is : $FIREWALL_CONF_DIR/$JBOSS_FW_CONF_JBOSS_NAME.xml
 EOF
 }
@@ -40,10 +43,11 @@ EOF
 #####################
 main()
 {
-	if [ "$#" -ne 2 ]; then usage; exit 1; fi
+	if [ "$#" -lt 2 ]; then usage; exit 1; fi
 
         cmd="$1";
         INST_DIR="$2";
+        VALUE="$3"; # optional
         PRODUCT="jboss";
 
         envfile="$INST_DIR/env/os.env";
@@ -108,6 +112,9 @@ main()
 
 	checkps ) ps -ef |grep httpd ;;
 	checkds ) check_data_source ;;
+
+	getsessionto ) get_session_timeout ;;
+	setsessionto ) set_session_timeout $VALUE ;;
 
 	-? | * )
 		usage;
@@ -320,6 +327,40 @@ setup_jboss_transaction()
 /subsystem=transactions:write-attribute(name=default-timeout,value=$JBOSS_TRAN_TIMEOUT)
 reload
 /subsystem=transactions:write-attribute(name=node-identifier,value=$JBOSS_TRAN_NODEID)
+EOF
+}
+
+#
+# 17.9. CONFIGURING HTTP SESSION TIMEOUT
+#
+# URL:
+#   https://access.redhat.com/documentation/en/red-hat-jboss-enterprise-application-platform/7.0/paged/configuration-guide/chapter-17-configuring-the-web-server-undertow
+#
+# The HTTP session timeout defines the period of inactive time needed 
+# to declare an HTTP session invalid. For example, a user accesses 
+# an application deployed to JBoss EAP which creates an HTTP session. 
+# If that user then attempts to access that application again 
+# after the HTTP session timeout, the original HTTP session will be 
+# invalidated and the user will be forced to create a new HTTP session.
+# This may result in the loss of unpersisted data or the user having 
+# to re-authenticate.
+#
+# default : 30 (min)
+#
+get_session_timeout()
+{
+	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
+	su - $OS_USER_NAME -c "$jbosscli" <<EOF
+/subsystem=undertow/servlet-container=default:read-attribute(name=default-session-timeout)
+EOF
+}
+set_session_timeout() # value
+{
+	SESSION_TIMEOUT=$1
+	jbosscli="$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT";
+	su - $OS_USER_NAME -c "$jbosscli" <<EOF
+/subsystem=undertow/servlet-container=default:write-attribute(name=default-session-timeout, value=$SESSION_TIMEOUT)
+reload
 EOF
 }
 
