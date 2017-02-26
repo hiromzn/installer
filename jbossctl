@@ -128,7 +128,7 @@ main()
 
 install_jboss()
 {
-	echo "installing jboss : $JBOSS_INSTALL_ARCHIVE -> $JBOSS_HOME ..."
+	message "installing jboss : $JBOSS_INSTALL_ARCHIVE -> $JBOSS_HOME ..."
 	(
 		mkdir -p $JBOSS_HOME;
 		cd $JBOSS_HOME
@@ -146,6 +146,7 @@ create_jboss_inst() # confdir
 {
 	confdir="$1";
 	confdirpath="`pwd`/$confdir";
+	message "installing jboss config file : $JBOSS_SERVER_NAME"
 	(
 		cd $JBOSS_HOME;
 

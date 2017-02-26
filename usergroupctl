@@ -97,8 +97,16 @@ add_user()
 $OS_USER_PASSWORD
 $OS_USER_PASSWORD
 EOF
+	create_dir;
 }
 
+create_dir()
+{
+	su - $OS_USER_NAME -c "\
+		mkdir $OS_USER_HOME/opt; \
+	"
+}
+	
 del_user()
 {
 	message "userdel -r -f $OS_USER_NAME"
