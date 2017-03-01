@@ -1,0 +1,26 @@
+. common.env
+
+set +e
+
+DATA_DIR=/$PROJ_NAME/home/data
+LOG_DIR=/$PROJ_NAME/home/logs
+
+[ ! -d "$DATA_DIR" ] && mkdir $DATA_DIR && chmod 755 $DATA_DIR;
+[ ! -d "$LOG_DIR" ] && mkdir $LOG_DIR && chmod 755 $LOG_DIR;
+
+for i in $INSTANCE_LIST
+do
+
+	u="${i}OU"
+	g="${i}OG"
+	d="/$PROJ_NAME/home/data/${i}"
+	l="/$PROJ_NAME/home/logs/${i}"
+
+	mkdir -p $d
+	chown -R $u:$g $d
+	chmod 750 $d
+	mkdir -p $l
+	chown -R $u:$g $l
+	chmod 750 $l
+done
+
