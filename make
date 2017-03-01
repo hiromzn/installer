@@ -55,6 +55,7 @@ package()
 		echo "creating archive in $arcfile";
 		mkdir work@@dir
 		cp -r $dirname work@@dir
+		cp common_static.env.customer work@@dir/$dirname/common_static.env
 		cd work@@dir
 		rm -rf $dirname/.git
 		tar czf $arcfile ./$dirname;
