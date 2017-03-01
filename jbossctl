@@ -20,6 +20,7 @@ command :
 	setup ......... setup all config.
 	clean ......... clean all config.
 
+	setupscript ... setup scripts.
 	wait .......... Wait for the process to start.
 	fwsetup ....... setup firewall configuration file.
 	fwclean ....... delete firewall configuration file.
@@ -70,8 +71,12 @@ main()
 	case "$cmd" in
 	setup )
 		install_jboss;
-		create_jboss_inst $confdir;
+		create_jboss_script $confdir;
 		fwsetup $confdir;
+		;;
+
+	setupscript )
+		create_jboss_script $confdir;
 		;;
 
 	fwsetup ) fwsetup $confdir ;;
@@ -142,7 +147,7 @@ install_jboss()
 	)
 }
 
-create_jboss_inst() # confdir
+create_jboss_script() # confdir
 {
 	confdir="$1";
 	confdirpath="`pwd`/$confdir";
@@ -155,8 +160,10 @@ create_jboss_inst() # confdir
 
 		cp $confdirpath/$JBOSS_CONF_FNAME $JBOSS_SERVER_NAME/bin
 		cp $confdirpath/$JBOSS_RUN_FNAME $JBOSS_SERVER_NAME/bin
+		cp $confdirpath/$JBOSS_RUN_SCRIPT_FNAME $JBOSS_SERVER_NAME/bin
 
 		chmod $JBOSS_RUN_PERM $JBOSS_SERVER_NAME/bin/$JBOSS_RUN_FNAME
+		chmod $JBOSS_RUN_PERM $JBOSS_SERVER_NAME/bin/$JBOSS_RUN_SCRIPT_FNAME
 
 		chown -R $OS_USER_NAME:$OS_GROUP_NAME $JBOSS_SERVER_NAME
 	)

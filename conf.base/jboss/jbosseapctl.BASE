@@ -1,0 +1,29 @@
+#!/bin/bash
+
+CMD="$1"
+
+JBOSS_HOME="__JBOSS_HOME__"
+SERVER_NAME="__JBOSS_SERVER_NAME__"
+
+RUN_SCRIPT=${JBOSS_HOME}/${SERVER_NAME}/bin/jbosseap.sh
+
+LOG_DIR=${JBOSS_HOME}/${SERVER_NAME}/log
+RUN_LOG=${LOG_DIR}/server.log
+
+MGMT_PORT="__JBOSS_PORT_MANAGE_HTTP__"
+
+case "$CMD" in
+start )
+	echo "starting jboss..."
+	[ ! -d "$LOG_DIR" ] && mkdir -p "$LOG_DIR";
+	nohup $RUN_SCRIPT >>$RUN_LOG 2>&1 &
+	;;
+stop )
+	echo "stopping jboss..."
+	$JBOSS_HOME/bin/jboss-cli.sh --controller=localhost:$MGMT_PORT --connect shutdown;
+	;;
+* )
+	echo "usage: $0 { start | stop }"
+	exit 1;
+	;;
+esac

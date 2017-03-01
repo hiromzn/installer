@@ -12,7 +12,7 @@ main()
 	case "$cmd" in
 	setup ) setup ;;
 	clean ) clean ;;
-	adduser | addconfig | wait | deploy | fwsetup | fwclean )
+	setupscript | adduser | addconfig | wait | deploy | fwsetup | fwclean )
 		cmd $cmd ;;
 	* ) 
 		pr_error "bad command : $cmd : $MYNAME";
