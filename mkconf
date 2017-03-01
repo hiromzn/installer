@@ -22,7 +22,7 @@ EOF
 
 main()
 {
-	envdir="$1"; # ex) ./<TOP>/env/
+	envdir="$1"; # ex) ./<$1>/env/
 
 	check_envdir $envdir;
 

@@ -90,6 +90,7 @@ mkdbscript()
 {
 	log "creaing DB(postgreSQL) script into $DB_SCRIPT_DIR";
 	mkdir -p "$DB_SCRIPT_DIR";
+	create_pg_hba "$DB_SCRIPT_DIR/pg_hba.conf";
 	cp ./dbtools/* "$DB_SCRIPT_DIR";
 	cp ./common.env "$DB_SCRIPT_DIR/..";
 	if [ -s "../common_static.env" ]; then cp ../common_static.env "$DB_SCRIPT_DIR/.."; fi
@@ -107,6 +108,53 @@ mkpackage()
 	mydirname="`basename \`pwd\``";
 	log "TAR package for db/batch server setup (package:../$mydirname-package.tar := ($SCRIPT_DIR, $REPO_DIR))"
 	tar cf ../$mydirname-package.tar $SCRIPT_DIR $REPO_DIR
+}
+
+create_pg_hba()
+{
+	tgt="$1";
+	log "creating PostgreSQL config file ($tgt)"
+	generate_pg_hba >$tgt
+}
+
+generate_pg_hba()
+{
+	cat <<EOF
+# PostgreSQL Client Authentication Configuration File
+# ===================================================
+# 
+# Refer to the "Client Authentication" section in the PostgreSQL
+# documentation for a complete description of this file.  A short
+# synopsis follows.
+# 
+# This file controls: which hosts are allowed to connect, how clients
+# are authenticated, which PostgreSQL user names they can use, which
+# databases they can access.  Records take one of these forms:
+# 
+# local      DATABASE  USER  METHOD  [OPTIONS]
+# host       DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
+# hostssl    DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
+# hostnossl  DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
+
+####################
+## user defined
+#####################
+#
+#TYPE   DATABASE        USER            ADDRESS                 METHOD
+
+local   all             postgres                                md5
+local   all             ${PROJ_NAME}db                                  md5
+
+EOF
+	for i in $DB_INSTANCE_LIST;
+	do
+		echo "host    ${i}D             ${i}DU            0.0.0.0/0               md5"
+	done
+
+	cat <<EOF
+
+# END of user defined
+EOF
 }
 
 main $*;
