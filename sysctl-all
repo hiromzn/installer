@@ -55,8 +55,7 @@ setup()
 {
 	for envdir in $REPO_DIR/*;
 	do
-		./sysctl setup httpd $envdir;
-		./sysctl setup jboss $envdir;
+		./sysctl setup $kind $envdir;
 	done
 }
 
@@ -64,8 +63,7 @@ clean()
 {
 	for envdir in $REPO_DIR/*;
 	do
-		./sysctl clean httpd $envdir;
-		./sysctl clean jboss $envdir;
+		./sysctl clean $kind $envdir;
 	done
 }
 
