@@ -108,6 +108,10 @@ main()
 		clean_jdbc_driver;
 		;;
 
+	getconfig )
+		get_config_and_runtime;
+		;;
+
 	adduser )
 		echo "add default group : $JBOSS_SERVER_NAME"
 		add_jboss_default_group;
@@ -375,6 +379,11 @@ EOF
 #######################
 # check
 #######################
+
+get_config_and_runtime()
+{
+	su - $OS_USER_NAME -c "$JBOSS_HOME/bin/$JBOSS_CLI $JBOSS_CLI_OPT ':read-resource(include-runtime=true, recursive=true, recursive-depth=10)'"
+}
 
 check_port()
 {
